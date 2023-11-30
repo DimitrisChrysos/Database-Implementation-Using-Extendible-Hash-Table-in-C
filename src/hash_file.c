@@ -174,7 +174,7 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
   CALL_BF(BF_GetBlock(file_desc, 0, header_block));
   void* data;
 
-  
+  // Start the insert!
 
   return HT_OK;
 }
