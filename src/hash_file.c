@@ -4,6 +4,7 @@
 
 #include "bf.h"
 #include "hash_file.h"
+#include "hash_table.h"
 #define MAX_OPEN_FILES 20
 
 #define CALL_BF(call)       \
@@ -17,13 +18,15 @@
 
 int open_files_counter = 0;
 HT_info open_files[MAX_OPEN_FILES];
-int *hash_array;
+int *hash_table;
 
 HT_ErrorCode HT_Init() {
   //insert code here
 
   // Αρχικά δεσμεύουμε χώρο για την εισαγωγή ενός item στο Hash Table
-  hash_array = (int*)malloc(sizeof(int));
+  hash_table = (int*)malloc(2*sizeof(int));
+  hash_table[0] = NULL;
+  hash_table[1] = NULL;
   
   return HT_OK;
 }
@@ -48,31 +51,6 @@ HT_ErrorCode HT_CreateIndex(const char *filename) {
   header->total_rec = 0;
   header->last_block = block;
   header->size_of_hash_table = 0;
-
-  // Δημιουργούμε τον πίνακα κατακερματισμού σε ένα άλλο αρχείο, 
-  // όμως με παρόμοια ονομασία, και κάνουμε store στο HT_info,
-  // το file descriptor αυτού του αρχείου
-  
-  // // Δημιουργούμε το όνομα και το αρχείο hash table, το οποίο και ανοίγουμε
-  // // επίσης ενημερώνουμε το header του βασικού αρχείου
-  // char hash_table_name[sizeof(filename) + 3];
-  // strcpy(hash_table_name, filename);
-  // strcat(hash_table_name, "_HT");
-  // int file_desc_HT;
-  // CALL_BF(BF_CreateFile(hash_table_name));
-  // CALL_BF(BF_OpenFile(hash_table_name, &file_desc_HT));
-  // header->file_descriptor_HT = file_desc_HT;
-  // // Αρχικοποίηση hash!
-  // CALL_BF(BF_AllocateBlock(file_desc_HT, block));
-  // void* data;
-  // data = BF_Block_GetData(block);
-  // // HT_info* header = data;
-
-  // // Κλείσιμο αρχείου hash_table_name
-  // CALL_BF(BF_CloseFile(file_desc));
-
-
-
 
   // Κλείσιμο αρχείου fileName και αποδέσμευση μνήμης
   BF_Block_SetDirty(block);

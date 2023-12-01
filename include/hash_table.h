@@ -2,21 +2,29 @@
 #define HASH_TABLE_H
 
 /* 
- * Αν χρειάζεται (δηλαδή αν η hash_function δίνει key μεγαλύτερο του size
- * του Hash Array), μεγάλωσε το Hash Array στο μέγεθος του key
+ * Διπλασίασε τον πίνακα hash_array
+ * Για κάθε θέση του hash_table με d bits πριν τον διπλασιασμό που έδειχνε σε block_number, 
+ * μετά τον διπλασιασμό που για αυτή τη θέση πλέον υπάρχουν 2, d+1 bits θέσεις:
+ *  a) Αν η παλιά θέση δεν έδειχνε σε block_number == NULL, κάνε τις δύο καινούργιες θέσεις 
+ *     να δείχνουν στο block που έδειχνε η παλιά θέση  
+ *  b) Αν η παλιά θέση έδειχνε σε block_number == NULL, κάνε τις δύο καινούργιες θέσεις να 
+ *     δείχνουν επίσης σε NULL
  */
-int realloc_hash(int *hash_array, int key, int hash_array_size);
+void double_hash(int *hash_array, int hash_array_size);
 
 /*
- * Δέχεται έναν int, το Hash Array και το μέγεθος του Hash Array, 
- * ελέγχει αν το Hash Array χρειάζεται resize και επιστρέφει το key 
- * του Hash Table
+ * Δέχεται έναν int και επιστρέφει ένα key
  */
-int hash_function(int dec, int *hash_array, int hash_array_size);
+int hash_function(int dec, int global_depth);
 
 /*
  * Μετέτρεψε έναν δεκαδικό σε bin και επέστρεψε ως string
  */
 char* dec2bin_string(int dec);
+
+/*
+ * Μετέτρεψε string από bin σε δεκαδικό και επέστρεψε τον
+ */
+int bin_string2dec(char* bin_string);
 
 #endif
