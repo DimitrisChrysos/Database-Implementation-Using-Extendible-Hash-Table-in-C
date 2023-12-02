@@ -15,7 +15,7 @@ typedef struct Record {
 
 /* Η δομή HΤ_info κρατάει μεταδεδομένα που σχετίζονται με το αρχείο επεκτατικού κατακερματισμού*/
 typedef struct {
-	int total_depth;	// Συνολικό βάθος
+	int global_depth;	// Συνολικό βάθος
 	int file_desc;	// Το file descriptor του αρχείου
 	int total_rec;   // Συνολικός αριθμός records που χωράνε στο αρχείο σωρού
     void* last_block; // Δείκτης που δείχνει κάθε φορά στο τελευταίο block
@@ -26,8 +26,7 @@ typedef struct {
 typedef struct {
     int num_of_rec;	// Αριθμός records στο συγκεκριμένο block
 	int capacity;   // Πόσα records χωράνε τη συγκεκριμένη στιγμή στο block
-	int local_depth;
-	int next_block_id;
+	int local_depth;	// Τοπικό βάθος
 } HT_block_info;
 
 /*
