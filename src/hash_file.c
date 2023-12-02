@@ -25,8 +25,8 @@ HT_ErrorCode HT_Init() {
 
   // Αρχικά δεσμεύουμε χώρο για την εισαγωγή ενός item στο Hash Table
   hash_table = (int*)malloc(2*sizeof(int));
-  hash_table[0] = NULL;
-  hash_table[1] = NULL;
+  hash_table[0] = -1;
+  hash_table[1] = -1;
   
   return HT_OK;
 }
@@ -45,7 +45,6 @@ HT_ErrorCode HT_CreateIndex(const char *filename) {
   void* data;
   data = BF_Block_GetData(block);
   HT_info* header = data;
-  strcpy(header->info, "Extendible Hash Table File");
   header->total_depth = 1;
   header->file_desc = file_desc;
   header->total_rec = 0;

@@ -4,39 +4,41 @@
 #include "hash_table.h"
 
 
-void double_hash(int *hash_array, int hash_array_size) {
+void double_hash(int **hash_array, int hash_array_size) {
 
     // Αντέγραψε το αρχικό hash_array
     int* temp_hash_array = (int*)malloc(hash_array_size*sizeof(int));
     for (int i = 0 ; i < hash_array_size ; i++) {
-        temp_hash_array[i] = hash_array[i];
+        temp_hash_array[i] = (*hash_array)[i];
     } 
 
     // Διπλασίασε το αρχικό array
-    hash_array = realloc(hash_array, 2*hash_array_size*sizeof(int));
+    *hash_array = realloc(*hash_array, 2*hash_array_size*sizeof(int));
 
     // Διόρθωσε τις καινούργιες θέσεις να δείχνουν στα σωστά block μετά το διπλασιασμό
+    // Αν ο αριθμός block είναι -1 σημαίνει ότι δεν δείχνει σε block
     for (int i = 0 ; i < hash_array_size ; i++) {
         int old_pos = i;
         int new_pos = 2*old_pos;
-        if (temp_hash_array[old_pos] != NULL) {
-            hash_array[new_pos] = temp_hash_array[old_pos];
-            hash_array[new_pos+1] = temp_hash_array[old_pos];
+        if (temp_hash_array[old_pos] != -1) {
+            (*hash_array)[new_pos] = temp_hash_array[old_pos];
+            (*hash_array)[new_pos+1] = temp_hash_array[old_pos];
         }
         else {
-            hash_array[new_pos] = NULL;
-            hash_array[new_pos+1] = NULL;
+            (*hash_array)[new_pos] = -1;
+            (*hash_array)[new_pos+1] = -1;
         }
     }
     free(temp_hash_array);
 }
 
-char* dec2bin_string(int dec);
+char* dec2bin_string(int dec, char* bin_string);
 
 int bin_string2dec(char* bin_string);
 
 int hash_function(int dec, int global_depth) {
     
+    // Το key είναι το hash key που φτιάχνει η hash_function
     int key = 0;
     while (1) {
         if (dec == 0) {
@@ -47,18 +49,23 @@ int hash_function(int dec, int global_depth) {
         dec = dec / 10;
     }
 
-    char bin_string_key[33] = dec2bin_string(key);
-    // Να φτιάξω να επιστρέφει η hash_function έναν δεκαδικό που άμα μπει στο hash_table
-    // να μας δίνει το block που πρέπει!
+    // Η hash_function επιστρέφει έναν δεκαδικό που άμα μπει στο hash_table
+    // να μας δίνει το block που πρέπει
+    char bin_string_key[33];
+    dec2bin_string(key, bin_string_key);
+    char first_bins[33]; 
+    for (int i = 0 ; i < global_depth ; i++) {
+        first_bins[i] = bin_string_key[i];
+    }
+    int new_key = bin_string2dec(first_bins);
 
-    return key;
+    return new_key;
 }
 
-char* dec2bin_string(int dec) {
+char* dec2bin_string(int dec, char* bin_string) {
     
     int bits_of_int = sizeof(int)*8;
     int bin_int[bits_of_int];
-    char bin_string[bits_of_int];
     int i = 0;
     while(1) {
         if (dec == 0) {

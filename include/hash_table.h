@@ -3,6 +3,7 @@
 
 /* 
  * Διπλασίασε τον πίνακα hash_array
+ * Παίρνει ορίσματα, τη διεύθυνση του πίνακα Hash Table, και το μέγεθος του
  * Για κάθε θέση του hash_table με d bits πριν τον διπλασιασμό που έδειχνε σε block_number, 
  * μετά τον διπλασιασμό που για αυτή τη θέση πλέον υπάρχουν 2, d+1 bits θέσεις:
  *  a) Αν η παλιά θέση δεν έδειχνε σε block_number == NULL, κάνε τις δύο καινούργιες θέσεις 
@@ -10,17 +11,17 @@
  *  b) Αν η παλιά θέση έδειχνε σε block_number == NULL, κάνε τις δύο καινούργιες θέσεις να 
  *     δείχνουν επίσης σε NULL
  */
-void double_hash(int *hash_array, int hash_array_size);
+void double_hash(int **hash_array, int hash_array_size);
 
 /*
- * Δέχεται έναν int και επιστρέφει ένα key
+ * Δέχεται έναν int και το global_depth του Hash Table και επιστρέφει ένα key
  */
 int hash_function(int dec, int global_depth);
 
 /*
- * Μετέτρεψε έναν δεκαδικό σε bin και επέστρεψε ως string
+ * Μετέτρεψε έναν δεκαδικό σε bin μέσα σε string και επέτρεψε το στο argument bin_string 
  */
-char* dec2bin_string(int dec);
+char* dec2bin_string(int dec, char* bin_string);
 
 /*
  * Μετέτρεψε string από bin σε δεκαδικό και επέστρεψε τον
