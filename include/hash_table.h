@@ -33,4 +33,6 @@ void dec2bin_string(int dec, char* bin_string);
  */
 int bin_string2dec(char* bin_string);
 
+
+
 #endif
