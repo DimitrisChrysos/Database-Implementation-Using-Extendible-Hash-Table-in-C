@@ -153,7 +153,7 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
 
   // Αρχίζει η διαδικασία του insert
   if (header_info->total_rec == 0) {
-
+    
     // Αρχικοποίσε ένα block και βάλε το ως last_block
     BF_Block *block;
     BF_Block_Init(&block);
@@ -181,6 +181,9 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
     CALL_BF(BF_GetBlockCounter(file_desc, &block_num));
     block_num--;
     hash_table[hash_value] = block_num;
+    printf("record.id = %d | global_depth = %d\n", record.id, header_info->global_depth);
+    printf("hash_value = %d | block_num = %d\n",hash_value, block_num);
+    print_HashTable(hash_table, header_info->size_of_hash_table);
 
     // Κάνε το block Dirty
     BF_Block_SetDirty(block);
@@ -194,7 +197,6 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
     int hash_value = hash_function(record.id, header_info->global_depth);
     int block_number = hash_table[hash_value];
     if (block_number == -1) {
-
       // Αρχικοποίσε ένα block και βάλε το ως last_block
       BF_Block *block;
       BF_Block_Init(&block);
@@ -291,7 +293,7 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
         CALL_BF(BF_AllocateBlock(file_desc, new_block));
 
         // Αρχικοποίησε και βάλε το header που αποθηκεύει το info του 
-        // block στο τέλος του block
+        // new_block στο τέλος του new_block
         data = BF_Block_GetData(new_block); 
         HT_block_info* new_block_header = data;
         new_block_header->num_of_rec = 0;

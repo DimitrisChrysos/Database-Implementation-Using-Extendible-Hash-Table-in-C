@@ -4,6 +4,11 @@
 #include <math.h>
 #include "hash_table.h"
 
+void print_HashTable(int* hash_table, int hash_array_size) {
+    for (int i = 0 ; i < hash_array_size ; i++) {
+        printf("hash_table[%d] = %d\n", i, hash_table[i]);
+    }
+}
 
 void double_hash(int **hash_array, int hash_array_size) {
 
@@ -33,7 +38,7 @@ void double_hash(int **hash_array, int hash_array_size) {
     free(temp_hash_array);
 }
 
-char* dec2bin_string(int dec, char* bin_string);
+void dec2bin_string(int dec, char* bin_string);
 
 int bin_string2dec(char* bin_string);
 
@@ -58,13 +63,17 @@ int hash_function(int dec, int global_depth) {
     for (int i = 0 ; i < global_depth ; i++) {
         first_bins[i] = bin_string_key[i];
     }
+    first_bins[global_depth] = '\0';
     int new_key = bin_string2dec(first_bins);
-
     return new_key;
 }
 
-char* dec2bin_string(int dec, char* bin_string) {
+void dec2bin_string(int dec, char* bin_string) {
     
+    if (dec == 0) {
+        strcpy(bin_string, "0");
+        return;
+    }
     int bits_of_int = sizeof(int)*8;
     int bin_int[bits_of_int];
     int i = 0;
@@ -95,11 +104,13 @@ char* dec2bin_string(int dec, char* bin_string) {
           counter++;
       }
   }
-  return bin_string;
 }
 
 int bin_string2dec(char* bin_string) {
 
+    if (strcmp(bin_string, "0") == 0) {
+        return 0;
+    }
     int len = strlen(bin_string);
     int temp_len = len;
     int dec = 0;

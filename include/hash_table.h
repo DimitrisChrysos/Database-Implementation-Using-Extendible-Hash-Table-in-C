@@ -1,6 +1,11 @@
 #ifndef HASH_TABLE_H
 #define HASH_TABLE_H
 
+/*
+ * Εκτυπώνει τις τιμές του Hash Table
+ */
+void print_HashTable(int* hash_table, int hash_array_size);
+
 /* 
  * Διπλασίασε τον πίνακα hash_array
  * Παίρνει ορίσματα, τη διεύθυνση του πίνακα Hash Table, και το μέγεθος του
@@ -21,7 +26,7 @@ int hash_function(int dec, int global_depth);
 /*
  * Μετέτρεψε έναν δεκαδικό σε bin μέσα σε string και επέτρεψε το στο argument bin_string 
  */
-char* dec2bin_string(int dec, char* bin_string);
+void dec2bin_string(int dec, char* bin_string);
 
 /*
  * Μετέτρεψε string από bin σε δεκαδικό και επέστρεψε τον
