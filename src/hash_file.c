@@ -153,7 +153,6 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
 
   // Αρχίζει η διαδικασία του insert
   if (header_info->total_rec == 0) {
-    header_info->total_rec++;
 
     // Αρχικοποίσε ένα block και βάλε το ως last_block
     BF_Block *block;
@@ -218,7 +217,7 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
       header_info->total_rec += 1;
 
       // Κάνε update το Hash Table
-      char* bin_string[33];
+      char bin_string[33];
       dec2bin_string(record.id, bin_string);
       char first_bit = bin_string[0];
       int pos_amount = pow(2, header_info->global_depth) / 2;
@@ -295,9 +294,9 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
         // block στο τέλος του block
         data = BF_Block_GetData(new_block); 
         HT_block_info* new_block_header = data;
-        new_block_header->num_of_rec = 1;
-        new_block_header->local_depth = 1;
-        new_block_header->capacity = BF_BLOCK_SIZE - sizeof(record) - sizeof(new_block_header);
+        new_block_header->num_of_rec = 0;
+        new_block_header->local_depth = old_block_header->local_depth;
+        new_block_header->capacity = BF_BLOCK_SIZE - sizeof(new_block_header);
         int offset = BF_BLOCK_SIZE - sizeof(new_block_header);
         memcpy(data + offset, new_block_header, sizeof(new_block_header));
 
@@ -318,8 +317,53 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
 
         // Βρες ποια record ήταν στο παλιό block και δες αν πρέπει 
         // να μετακινηθούν για να πάνε στο καινούργιο
+        void* old_block_data = BF_Block_GetData(old_block);
+        void* new_block_data = BF_Block_GetData(new_block);
+        Record temp_rec;
+        for (int i = 0 ; i < old_block_header->num_of_rec ; i++) {
 
+          // Βάλε στο temp_rec το record που εξετάζουμε σε αυτό το loop
+          // και βρες το hash_value του
+          int offset = i*record_size;
+          memcpy(&temp_rec, old_block_data + offset, record_size);
+          int temp_hash_value = hash_function(temp_rec.id, header_info->global_depth);
+
+          // Αν το συγκεκριμένο record πλέον πρέπει να αλλάξει block,
+          // γιατί η hash_function δίνει νέο hash_value
+          if (hash_table[temp_hash_value] != old_block_num) {
+
+            // Αφαίρεσε το από το παλιό block
+            old_block_header->capacity += record_size;
+            old_block_header->num_of_rec--;
+
+            // Πρόσθεσε το στο καινούργιο block
+            memcpy(new_block_data + offset, &temp_rec, record_size);
+            new_block_header->capacity -= record_size;
+            new_block_header->num_of_rec++;
+          }
+        }
+
+        // Βρίσκουμε σε ποιο από τα δύο block πρέπει να πάει το νέο record 
+        // για το οποίο έγινε το split και το βάζουμε
+        hash_value = hash_function(record.id, header_info->global_depth);
+        block_number = hash_table[hash_value];
+        BF_GetBlock(file_desc, block_number, block);
+        data = BF_Block_GetData(block);
+        block_header = data + BF_BLOCK_SIZE - sizeof(block_header);
+        offset = record_size*(block_header->num_of_rec);
+        memcpy(new_block_data + offset, &temp_rec, record_size);
+        block_header->num_of_rec++;        
+        block_header->capacity -= record_size;
+        header_info->total_rec++;
+        header_info->last_block = block;
         
+        // Κάνε τα block Dirty
+        BF_Block_SetDirty(old_block);
+        BF_Block_SetDirty(new_block);
+
+        // Κάνε το header block του αρχείου Dirty και Destroy
+        BF_Block_SetDirty(header_block);
+        BF_Block_Destroy(&header_block);
       }
     }
   }
