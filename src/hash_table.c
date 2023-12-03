@@ -40,7 +40,7 @@ void double_hash(int **hash_array, int hash_array_size) {
     free(temp_hash_array);
 }
 
-void dec2bin_string(int dec, char* bin_string);
+void dec2bin_string(unsigned int dec, char* bin_string);
 
 int bin_string2dec(char* bin_string);
 
@@ -59,9 +59,9 @@ int hash_function(int dec, int global_depth) {
     // }
 
     // New hash_fucntion
-    int block_size = ((BF_BLOCK_SIZE - sizeof(HT_block_info)) / sizeof(Record));
+    int records_per_block = ((BF_BLOCK_SIZE - sizeof(HT_block_info)) / sizeof(Record));
     int double_hash_counter = global_depth-1;
-    int key = dec % ((int)pow(2, double_hash_counter) * block_size); 
+    int key = dec % ((int)pow(2, double_hash_counter) * records_per_block); 
 
 
     // Η hash_function επιστρέφει έναν δεκαδικό που άμα μπει στο hash_table
@@ -77,7 +77,7 @@ int hash_function(int dec, int global_depth) {
     return new_key;
 }
 
-void dec2bin_string(int dec, char* bin_string) {
+void dec2bin_string(unsigned int dec, char* bin_string) {
     
     if (dec == 0) {
         strcpy(bin_string, "0");

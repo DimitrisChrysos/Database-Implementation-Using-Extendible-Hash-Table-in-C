@@ -527,7 +527,7 @@ HT_ErrorCode HT_PrintAllEntries(int indexDesc, int *id) {
   HT_info* header_info = &open_files[indexDesc];
   int file_desc = header_info->file_desc;
 
-  // print_HashTable(hash_table, header_info->size_of_hash_table);
+  print_HashTable(hash_table, header_info->size_of_hash_table);
   printf("size_of_rec = %ld, recs_per_block = %ld\n", sizeof(Record), (BF_BLOCK_SIZE-sizeof(HT_block_info))/sizeof(Record));
 
   BF_Block *block;
@@ -547,23 +547,23 @@ HT_ErrorCode HT_PrintAllEntries(int indexDesc, int *id) {
       }
     }
   }
-  else {
-    int blocks_num;
-    CALL_BF(BF_GetBlockCounter(file_desc, &blocks_num));
-    printf("block_amount = %d\n", blocks_num);
-    for (int i = 1 ; i < blocks_num ; i++) {
-      CALL_BF(BF_GetBlock(file_desc, i, block));
-      void* data = BF_Block_GetData(block); 
-      HT_block_info* block_header = data + BF_BLOCK_SIZE - sizeof(block_header);
-      Record temp_rec;
-      for (int j = 0 ; j < block_header->num_of_rec ; j++) {
-        int offset = j*sizeof(Record);
-        memcpy(&temp_rec, data + offset, sizeof(Record));
-        printf("Block %d :", i);
-        printRecord(temp_rec);
-      }
-    }
-  }
+  // else {
+  //   int blocks_num;
+  //   CALL_BF(BF_GetBlockCounter(file_desc, &blocks_num));
+  //   printf("block_amount = %d\n", blocks_num);
+  //   for (int i = 1 ; i < blocks_num ; i++) {
+  //     CALL_BF(BF_GetBlock(file_desc, i, block));
+  //     void* data = BF_Block_GetData(block); 
+  //     HT_block_info* block_header = data + BF_BLOCK_SIZE - sizeof(block_header);
+  //     Record temp_rec;
+  //     for (int j = 0 ; j < block_header->num_of_rec ; j++) {
+  //       int offset = j*sizeof(Record);
+  //       memcpy(&temp_rec, data + offset, sizeof(Record));
+  //       printf("Block %d :", i);
+  //       printRecord(temp_rec);
+  //     }
+  //   }
+  // }
   CALL_BF(BF_UnpinBlock(block));
   BF_Block_Destroy(&block);
 

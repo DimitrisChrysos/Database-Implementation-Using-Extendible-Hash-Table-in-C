@@ -26,7 +26,7 @@ int hash_function(int dec, int global_depth);
 /*
  * Μετέτρεψε έναν δεκαδικό σε bin μέσα σε string και επέτρεψε το στο argument bin_string 
  */
-void dec2bin_string(int dec, char* bin_string);
+void dec2bin_string(unsigned int dec, char* bin_string);
 
 /*
  * Μετέτρεψε string από bin σε δεκαδικό και επέστρεψε τον
