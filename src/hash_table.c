@@ -3,6 +3,8 @@
 #include <string.h>
 #include <math.h>
 #include "hash_table.h"
+#include "bf.h"
+#include "hash_file.h"
 
 void print_HashTable(int* hash_table, int hash_array_size) {
     for (int i = 0 ; i < hash_array_size ; i++) {
@@ -44,16 +46,23 @@ int bin_string2dec(char* bin_string);
 
 int hash_function(int dec, int global_depth) {
     
+    // Old hash_fucntion
     // Το key είναι το hash key που φτιάχνει η hash_function
-    int key = 0;
-    while (1) {
-        if (dec == 0) {
-            break;
-        }
-        int digit = dec % 10;
-        key += digit;
-        dec = dec / 10;
-    }
+    // int key = 0;
+    // while (1) {
+    //     if (dec == 0) {
+    //         break;
+    //     }
+    //     int digit = dec % 10;
+    //     key += digit;
+    //     dec = dec / 10;
+    // }
+
+    // New hash_fucntion
+    int block_size = ((BF_BLOCK_SIZE - sizeof(HT_block_info)) / sizeof(Record));
+    int double_hash_counter = global_depth-1;
+    int key = dec % ((int)pow(2, double_hash_counter) * block_size); 
+
 
     // Η hash_function επιστρέφει έναν δεκαδικό που άμα μπει στο hash_table
     // να μας δίνει το block που πρέπει
