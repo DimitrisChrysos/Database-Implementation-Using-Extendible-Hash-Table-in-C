@@ -84,7 +84,7 @@ int main() {
     r = rand() % 10;
     memcpy(record.city, cities[r], strlen(cities[r]) + 1);
 
-    if (id > 406) {
+    if (id > 576) {
       break;
     }
     printf("%d\n", id);

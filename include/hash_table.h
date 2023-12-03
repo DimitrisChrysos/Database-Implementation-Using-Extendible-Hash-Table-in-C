@@ -1,5 +1,12 @@
+#include <stdint.h>
 #ifndef HASH_TABLE_H
 #define HASH_TABLE_H
+
+/*
+ * FNV-1a Hash Function, που βρέθηκε εδώ:
+ * https://cs.stackexchange.com/questions/60950/hash-multiple-integers-directly-using-fnv-1a
+ */
+uint32_t hash(char* data, size_t bytes);
 
 /*
  * Εκτυπώνει τις τιμές του Hash Table

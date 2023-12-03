@@ -1,10 +1,28 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 #include <math.h>
 #include "hash_table.h"
 #include "bf.h"
 #include "hash_file.h"
+
+#define OFFSET_BASIS 2166136261ul
+#define FNV_PRIME 16777619ul
+
+
+uint32_t hash(char* data, size_t bytes)
+{
+    
+   uint32_t h = OFFSET_BASIS;
+
+   for (size_t i = 0; i < bytes; ++i)
+   {
+      h = (h ^ data[i]) * FNV_PRIME;
+   }
+
+   return h;
+}
 
 void print_HashTable(int* hash_table, int hash_array_size) {
     for (int i = 0 ; i < hash_array_size ; i++) {
@@ -46,34 +64,37 @@ int bin_string2dec(char* bin_string);
 
 int hash_function(int dec, int global_depth) {
     
-    // Old hash_fucntion
-    // Το key είναι το hash key που φτιάχνει η hash_function
-    // int key = 0;
-    // while (1) {
-    //     if (dec == 0) {
-    //         break;
-    //     }
-    //     int digit = dec % 10;
-    //     key += digit;
-    //     dec = dec / 10;
-    // }
+    // Βρες πόσα ψηφία έχει ο dec
+    int counter = 0;
+    int temp_dec = dec;
+    while (temp_dec > 0) {
+        temp_dec /= 10;
+        counter++;
+    }
+    
+    // Κάνε τον dec, string
+    char buffer[counter+1];
+    sprintf(buffer, "%d", dec);
 
-    // New hash_fucntion
-    int records_per_block = ((BF_BLOCK_SIZE - sizeof(HT_block_info)) / sizeof(Record));
-    int double_hash_counter = global_depth-1;
-    int key = dec % ((int)pow(2, double_hash_counter) * records_per_block); 
+    // Κάλεσε την FNV-1a Hash Function για τον dec που είναι σε μορφή string
+    unsigned int key = hash(buffer, sizeof(buffer));
 
-
-    // Η hash_function επιστρέφει έναν δεκαδικό που άμα μπει στο hash_table
-    // να μας δίνει το block που πρέπει
+    // Κάνε το key από την FNV-1a, bin σε string και βρες το μήκος του
     char bin_string_key[33];
     dec2bin_string(key, bin_string_key);
-    char first_bins[33]; 
-    for (int i = 0 ; i < global_depth ; i++) {
-        first_bins[i] = bin_string_key[i];
+    int len = strlen(bin_string_key);
+    
+    // Πάρε τα τελευταία global_depth ψηφία από τον string που βρέθηκε προηγουμένος
+    char last_bins[33];
+    counter = 0;
+    for (int i = len-1 ; i > len-1 - global_depth ; i--) {
+        last_bins[counter] = bin_string_key[i];
+        counter++;
     }
-    first_bins[global_depth] = '\0';
-    int new_key = bin_string2dec(first_bins);
+    last_bins[counter] = '\0';
+
+    // Κάνε αυτά τα τελευταία global_depth ψηφία δεκαδικό και επέστεψε τον ως new_key
+    int new_key = bin_string2dec(last_bins);
     return new_key;
 }
 
