@@ -84,16 +84,17 @@ int main() {
     r = rand() % 10;
     memcpy(record.city, cities[r], strlen(cities[r]) + 1);
 
-    // if (id > 577) {
-    //   break;
-    // }
+    if (id > 962) {
+      break;
+    }
     printf("%d\n", id);
     CALL_OR_DIE(HT_InsertEntry(indexDesc, record));
   }
 
   printf("RUN PrintAllEntries\n");
-  // int id = rand() % RECORDS_NUM;
-  // CALL_OR_DIE(HT_PrintAllEntries(indexDesc, &id));
+  int id = rand() % RECORDS_NUM;
+  printf("id = %d\n", id);
+  CALL_OR_DIE(HT_PrintAllEntries(indexDesc, &id));
   CALL_OR_DIE(HT_PrintAllEntries(indexDesc, NULL));
   //CALL_OR_DIE(HT_PrintAllEntries(indexDesc, NULL));
 
