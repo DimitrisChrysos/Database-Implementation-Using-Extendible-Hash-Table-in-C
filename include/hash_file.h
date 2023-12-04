@@ -20,6 +20,7 @@ typedef struct {
 	int total_rec;   // Συνολικός αριθμός records που χωράνε στο αρχείο σωρού
     void* last_block; // Δείκτης που δείχνει κάθε φορά στο τελευταίο block
 	int size_of_hash_table;
+	void* header_block;
 } HT_info;
 
 /* Η δομή HT_block_info κρατάει μεταδεδομένα του block ενός αρχείου επεκτατικού κατακερματισμού*/
