@@ -84,9 +84,9 @@ int main() {
     r = rand() % 10;
     memcpy(record.city, cities[r], strlen(cities[r]) + 1);
 
-    // if (id > 260) {
-    //   break;
-    // }
+    if (id > 962) {
+      break;
+    }
     // printf("%d\n", id);
     CALL_OR_DIE(HT_InsertEntry(indexDesc, record));
   }
