@@ -93,9 +93,9 @@ int main() {
 
   printf("RUN PrintAllEntries\n");
   int id = rand() % RECORDS_NUM;
-  printf("id = %d\n", id);
-  CALL_OR_DIE(HT_PrintAllEntries(indexDesc, &id));
-  CALL_OR_DIE(HT_PrintAllEntries(indexDesc, NULL));
+  // printf("id = %d\n", id);
+  // CALL_OR_DIE(HT_PrintAllEntries(indexDesc, &id));
+  // CALL_OR_DIE(HT_PrintAllEntries(indexDesc, NULL));
   //CALL_OR_DIE(HT_PrintAllEntries(indexDesc, NULL));
 
 

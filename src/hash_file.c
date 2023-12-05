@@ -298,31 +298,28 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
         
         if (block_header->local_depth < header_info->global_depth) {
           
-          if (record.id == 963) {
-            printf("EIMAI EDO SOU LEO RE BRO BROO OBROOOO\n");
-          }
+          // if (record.id == 963) {
+          //   printf("EIMAI EDO SOU LEO RE BRO BROO OBROOOO\n");
+          // }
           // Πάρε το παλιό block
           BF_Block *old_block = block;
           HT_block_info* old_block_header = block_header;
 
-          if (record.id == 963) {
-            printf("\n\nold_block_recs = %d\n", old_block_header->num_of_rec);
-            printf("old_block_local_depth = %d\n", old_block_header->local_depth);
-            printf("global_depth = %d\n\n\n", header_info->global_depth);
-          }
+          // if (record.id == 963) {
+          //   printf("\n\nold_block_recs = %d\n", old_block_header->num_of_rec);
+          //   printf("old_block_local_depth = %d\n", old_block_header->local_depth);
+          //   printf("global_depth = %d\n\n\n", header_info->global_depth);
+          // }
 
           // Κάνε Unpin και Destroy το παλιό block
           BF_Block *last_block = header_info->last_block;
           CALL_BF(BF_UnpinBlock(last_block));
           BF_Block_Destroy(&last_block);
 
-
           // Αρχικοποίσε ένα block ως new_block και βάλε το ως last_block
           BF_Block *new_block;
           BF_Block_Init(&new_block);
-          printf(":))))))))))\n");
           CALL_BF(BF_AllocateBlock(file_desc, new_block));
-          printf(":(((((((((((((\n");
           header_info->last_block = block;
 
           // Αρχικοποίησε και βάλε το header που αποθηκεύει το info του 
@@ -339,6 +336,17 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
           // Αύξησε το local_depth στο παλιό και το νέο block
           old_block_header->local_depth++;
           new_block_header->local_depth++;
+
+          // if (record.id == 963) {
+          //   printf("hash_table[%d] = %d\n\n\n", hash_value, hash_table[hash_value]);
+          //   for (int i = 0; i < header_info->size_of_hash_table; i++) {
+          //     if (hash_table[i] == block_number) {
+          //       printf("hash_table[%d] = %d\n", i, hash_table[i]);
+          //     }
+          //   }
+          // }
+
+
 
           // Φτιάξε σε ποια block δείχνουν οι θέσεις του Hash Table
           int count = 0, half_bl = (int)pow(2, header_info->global_depth - (old_block_header->local_depth - 1));
@@ -359,6 +367,22 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
               }
             }
           }
+
+
+
+          // if (record.id) { // == 963) {
+          //   printf("\n\nhash_table[%d] = %d\n\n\n\n\n\n\n\n", hash_value, hash_table[hash_value]);
+          //   for (int i = 0; i < header_info->size_of_hash_table; i++) {
+          //     if (hash_table[i] == block_number) {
+          //       printf("hash_table[%d] = %d\n", i, hash_table[i]);
+          //     }
+          //   }
+          //   for (int i = 0; i < header_info->size_of_hash_table; i++) {
+          //     if (hash_table[i] == new_block_num) {
+          //       printf("hash_table[%d] = %d\n", i, hash_table[i]);
+          //     }
+          //   }
+          // }
 
           
 
@@ -382,10 +406,15 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
 
             // Αν το συγκεκριμένο record πλέον πρέπει να αλλάξει block,
             // γιατί η hash_function δίνει νέο hash_value
-            printf("new_hash_value = %d | ", temp_hash_value);
-            printf("hash_table[new_hash_value] = %d\n", hash_table[temp_hash_value]);
+            // if (record.id){// == 963) {
+            //   int old_hash_value = hash_function(temp_rec.id, header_info->global_depth-1);
+            //   printf("new_hash_value = %d | ", temp_hash_value);
+            //   printf("hash_table[new_hash_value] = %d\n", hash_table[temp_hash_value]);
+            // }
             if (hash_table[temp_hash_value] != old_block_num) {
-              printf("mpeno kan edo oeoooeoeoeo?\n");
+              // if (record.id == 963) {
+              //   printf("mpeno kan edo oeoooeoeoeo?\n");
+              // }
               // Αφαίρεσε το από το παλιό block
               old_block_header->capacity += record_size;
               old_block_header->num_of_rec--;
@@ -428,16 +457,16 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
           block_header = data + BF_BLOCK_SIZE - sizeof(block_header);
           offset = record_size*(block_header->num_of_rec);
 
-          if (record.id == 963) {
-            printf("old_block_recs = %d\n", old_block_header->num_of_rec);
-            printf("old_block_local_depth = %d\n", old_block_header->local_depth);
-          }
+          // if (record.id == 963) {
+          //   printf("old_block_recs = %d\n", old_block_header->num_of_rec);
+          //   printf("old_block_local_depth = %d\n", old_block_header->local_depth);
+          // }
 
           memcpy(data + offset, &record, record_size);
 
-          if (record.id == 963) {
-            printf("old_block_recs = %d\n", old_block_header->num_of_rec);
-          }
+          // if (record.id == 963) {
+          //   printf("old_block_recs = %d\n", old_block_header->num_of_rec);
+          // }
 
           block_header->num_of_rec++;
           block_header->capacity -= record_size;
@@ -446,12 +475,12 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
           // CALL_BF(BF_UnpinBlock(temp_block));
           // BF_Block_Destroy(&temp_block);
 
-          if (record.id == 963) {
-            printf("EIMAI EDO SOU LEO RE BRO BROO OBROOOO\n");
-            printf("old_block_num = %d\n", old_block_num);
-            printf("old_block_recs = %d\n", old_block_header->num_of_rec);
-            printf("old_block_local_depth = %d\n", old_block_header->local_depth);
-          }
+          // if (record.id == 963) {
+          //   printf("EIMAI EDO SOU LEO RE BRO BROO OBROOOO\n");
+          //   printf("old_block_num = %d\n", old_block_num);
+          //   printf("old_block_recs = %d\n", old_block_header->num_of_rec);
+          //   printf("old_block_local_depth = %d\n", old_block_header->local_depth);
+          // }
 
           // Κάνε τα block Dirty
           // BF_Block_SetDirty(old_block);
