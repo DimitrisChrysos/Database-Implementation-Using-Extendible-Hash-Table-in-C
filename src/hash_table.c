@@ -13,7 +13,7 @@
 
 uint32_t hash(char* data, size_t bytes)
 {
-    
+
    uint32_t h = OFFSET_BASIS;
 
    for (size_t i = 0; i < bytes; ++i)
