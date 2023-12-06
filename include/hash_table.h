@@ -23,7 +23,7 @@ void print_HashTable(int* hash_table, int hash_array_size);
  *  b) Αν η παλιά θέση έδειχνε σε block_number == NULL, κάνε τις δύο καινούργιες θέσεις να 
  *     δείχνουν επίσης σε NULL
  */
-void double_hash(int **hash_array, int hash_array_size);
+void double_hash(void* header_inf);
 
 /*
  * Δέχεται έναν int και το global_depth του Hash Table και επιστρέφει ένα key

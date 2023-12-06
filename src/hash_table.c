@@ -30,11 +30,11 @@ void print_HashTable(int* hash_table, int hash_array_size) {
     }
 }
 
-void double_hash(int **hash_array, int hash_array_size) {
+void double_hash(void* header_inf) {
 
-    // HT_info* header_info = header_inf;
-    // int hash_array_size = header_info->size_of_hash_table;
-    // int ** hash_array = &(header_info->hash_table);
+    HT_info* header_info = header_inf;
+    int hash_array_size = header_info->size_of_hash_table;
+    int **hash_array = &(header_info->hash_table);
     // Αντέγραψε το αρχικό hash_array
     int* temp_hash_array = (int*)malloc(hash_array_size*sizeof(int));
     for (int i = 0 ; i < hash_array_size ; i++) {

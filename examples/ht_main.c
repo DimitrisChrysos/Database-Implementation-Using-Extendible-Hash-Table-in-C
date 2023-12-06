@@ -91,7 +91,7 @@ int main() {
     // if (id > 962) {
     //   break;
     // }
-    printf("%d\n", id);
+    // printf("%d\n", id);
     CALL_OR_DIE(HT_InsertEntry(indexDesc, record));
   }
 
