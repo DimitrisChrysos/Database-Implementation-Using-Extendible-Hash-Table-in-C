@@ -27,6 +27,7 @@ typedef struct {
     int num_of_rec;	// Αριθμός records στο συγκεκριμένο block
 	int capacity;   // Πόσα records χωράνε τη συγκεκριμένη στιγμή στο block
 	int local_depth;	// Τοπικό βάθος
+	void* next_block_header;
 } HT_block_info;
 
 /*
