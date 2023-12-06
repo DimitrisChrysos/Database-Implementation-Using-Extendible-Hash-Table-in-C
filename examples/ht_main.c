@@ -85,7 +85,7 @@ int main() {
     memcpy(record.city, cities[r], strlen(cities[r]) + 1);
 
 
-    // if (id > 35) {
+    // if (id == 34) {
     //   break;
     // }
     // if (id > 962) {

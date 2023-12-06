@@ -199,7 +199,7 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
     int hash_value = hash_function(record.id, header_info->global_depth);
     int block_number = hash_table[hash_value];
     if (block_number == -1) {
-
+      
       // Πάρε το header του τελευταίου block
       BF_Block *last_block = header_info->last_block;
       data = BF_Block_GetData(last_block);
@@ -283,6 +283,7 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
       // του αρχείου και του block
       if (block_header->capacity - record_size >= 0) {
         
+        
         // Βάλε το record στην θέση που πρέπει και ενημέρωσε τα μεταδεδομένα
         int offset = record_size*(block_header->num_of_rec);
         memcpy(data + offset, &record, record_size);
@@ -360,7 +361,6 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
             int new_block_num;
             if (half_bl == 1) {
               
-              
               // Διπλασίασε το Hash Table και ενημέρωσε τα positions
               header_info->global_depth++;
               double_hash(&hash_table, header_info->size_of_hash_table);
@@ -407,7 +407,7 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
             Record temp_rec;
             int count = 0;
             int save_old_block_recs = old_block_header->num_of_rec;
-            for (int i = 0 ; i < old_block_header->num_of_rec ; i++) {
+            for (int i = 0 ; i < old_block_header->num_of_rec - 1 ; i++) {
 
               // Βάλε στο temp_rec το record που εξετάζουμε σε αυτό το loop
               // και βρες το hash_value του
@@ -422,11 +422,11 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
               // Αν το συγκεκριμένο record, πρέπει πλέον να αλλάξει block
               if (hash_table[temp_hash_value] != old_block_num) {
                 
-                // Αφαίρεσε το από το παλιό block
+                // Αφαίρεσε το από το παλιό block και φτιάξε τις θέσεις των records
                 old_block_header->capacity += record_size;
-                old_block_header->num_of_rec--;
                 void* data_of_replaced_rec = old_block_data + offset;
-                for (int j = i ; j < 8 ; j++) {
+                old_block_header->num_of_rec--;
+                for (int j = i ; j < old_block_header->num_of_rec ; j++) {
                   memcpy(data_of_replaced_rec, data_of_replaced_rec + record_size, record_size);
                   data_of_replaced_rec += record_size;
                 }
@@ -448,6 +448,7 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
             
 
             if (old_block_header->num_of_rec == save_old_block_recs && half_bl != 0) {
+              
               continue;
             }
 
@@ -472,7 +473,7 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
               // data = BF_Block_GetData(new_block);
               // block_header = data + BF_BLOCK_SIZE - sizeof(HT_block_info);
               offset = record_size*(new_block_header->num_of_rec);
-              memcpy(data + offset, &record, record_size);
+              memcpy(new_block_data + offset, &record, record_size);
               new_block_header->num_of_rec++;
               new_block_header->capacity -= record_size;
               header_info->total_rec++; 
@@ -482,7 +483,7 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
               BF_Block_SetDirty(new_block);
               BF_GetBlock(file_desc, block_number, old_block);
               offset = record_size*(old_block_header->num_of_rec);
-              memcpy(data + offset, &record, record_size);
+              memcpy(old_block_data + offset, &record, record_size);
               old_block_header->num_of_rec++;
               old_block_header->capacity -= record_size;
               header_info->total_rec++; 
@@ -554,7 +555,7 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
 
           Record temp_rec;
           int count = 0;
-          for (int i = 0 ; i < old_block_header->num_of_rec ; i++) {
+          for (int i = 0 ; i < old_block_header->num_of_rec - 1; i++) {
 
             // Βάλε στο temp_rec το record που εξετάζουμε σε αυτό το loop
             // και βρες το hash_value του
@@ -594,7 +595,7 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
 
           if (block_number != old_block_num) {
             offset = record_size*(new_block_header->num_of_rec);
-            memcpy(data + offset, &record, record_size);
+            memcpy(new_block_data + offset, &record, record_size);
             new_block_header->num_of_rec++;
             new_block_header->capacity -= record_size;
             header_info->total_rec++; 
@@ -604,7 +605,7 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
             BF_Block_SetDirty(new_block);
             BF_GetBlock(file_desc, block_number, old_block);
             offset = record_size*(old_block_header->num_of_rec);
-            memcpy(data + offset, &record, record_size);
+            memcpy(old_block_data + offset, &record, record_size);
             old_block_header->num_of_rec++;
             old_block_header->capacity -= record_size;
             header_info->total_rec++; 
