@@ -13,6 +13,10 @@ typedef struct Record {
 	char city[20];
 } Record;
 
+typedef struct {
+	int positions;
+} HT_file_header;
+
 /* Η δομή HΤ_info κρατάει μεταδεδομένα που σχετίζονται με το αρχείο επεκτατικού κατακερματισμού*/
 typedef struct {
 	int global_depth;	// Συνολικό βάθος
@@ -20,6 +24,8 @@ typedef struct {
 	int total_rec;   // Συνολικός αριθμός records που χωράνε στο αρχείο σωρού
     void* last_block; // Δείκτης που δείχνει κάθε φορά στο τελευταίο block
 	int size_of_hash_table;
+	// int file_descriptor_HT;
+	int* hash_table;
 } HT_info;
 
 /* Η δομή HT_block_info κρατάει μεταδεδομένα του block ενός αρχείου επεκτατικού κατακερματισμού*/

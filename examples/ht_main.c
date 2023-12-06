@@ -91,7 +91,7 @@ int main() {
     // if (id > 962) {
     //   break;
     // }
-    // printf("%d\n", id);
+    printf("%d\n", id);
     CALL_OR_DIE(HT_InsertEntry(indexDesc, record));
   }
 
@@ -102,10 +102,11 @@ int main() {
   // int dec=996;
   // CALL_OR_DIE(HT_PrintAllEntries(indexDesc, &dec));
   CALL_OR_DIE(HT_PrintAllEntries(indexDesc, NULL));
+  // CALL_OR_DIE(HT_PrintAllEntries(indexDesc, NULL));
 
   CALL_OR_DIE(HT_CloseFile(indexDesc));
-  CALL_OR_DIE(HT_OpenIndex(FILE_NAME, &indexDesc)); 
-  CALL_OR_DIE(HT_PrintAllEntries(indexDesc, NULL));
+  // CALL_OR_DIE(HT_OpenIndex(FILE_NAME, &indexDesc)); 
+  // CALL_OR_DIE(HT_PrintAllEntries(indexDesc, NULL));
 
   BF_Close();
 }
