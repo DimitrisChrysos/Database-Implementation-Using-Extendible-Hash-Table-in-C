@@ -96,14 +96,16 @@ int main() {
   }
 
   printf("RUN PrintAllEntries\n");
-  int id = rand() % RECORDS_NUM;
+  // int id = rand() % RECORDS_NUM;
   // printf("id = %d\n", id);
   // CALL_OR_DIE(HT_PrintAllEntries(indexDesc, &id));
-  // CALL_OR_DIE(HT_PrintAllEntries(indexDesc, NULL));
+  // int dec=996;
+  // CALL_OR_DIE(HT_PrintAllEntries(indexDesc, &dec));
   CALL_OR_DIE(HT_PrintAllEntries(indexDesc, NULL));
 
   CALL_OR_DIE(HT_CloseFile(indexDesc));
-  // CALL_OR_DIE(HT_OpenIndex(FILE_NAME, &indexDesc)); 
-  // CALL_OR_DIE(HT_PrintAllEntries(indexDesc, NULL));
+  CALL_OR_DIE(HT_OpenIndex(FILE_NAME, &indexDesc)); 
+  CALL_OR_DIE(HT_PrintAllEntries(indexDesc, NULL));
+
   BF_Close();
 }

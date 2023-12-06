@@ -459,16 +459,6 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
             
 
             if (block_number != old_block_num) {
-              
-              if (new_block_header->num_of_rec == 8) {
-                old_block = new_block;
-                old_block_data = new_block_data;
-                old_block_header = new_block_header;
-                old_block_num = new_block_num;
-                BF_Block_SetDirty(new_block);
-                BF_Block_SetDirty(old_block);
-                continue;
-              }
 
               // data = BF_Block_GetData(new_block);
               // block_header = data + BF_BLOCK_SIZE - sizeof(HT_block_info);
@@ -636,14 +626,21 @@ HT_ErrorCode HT_PrintAllEntries(int indexDesc, int *id) {
   HT_info* header_info = &open_files[indexDesc];
   int file_desc = header_info->file_desc;
 
-  BF_Block *block = header_info->last_block;
+  BF_Block *block;
+  BF_Block_Init(&block);
   if (id != NULL) {
     int hash_value = hash_function(*id, header_info->global_depth);
+    // if (*id == 996) {
+    //   printf("hash_table[hash_value] = %d\n", hash_table[hash_value]);
+    // }
     int block_number = hash_table[hash_value];
     CALL_BF(BF_GetBlock(file_desc, block_number, block));
     void* data = BF_Block_GetData(block); 
     HT_block_info* block_header = data + BF_BLOCK_SIZE - sizeof(HT_block_info);
     Record temp_rec;
+    // if (*id == 996) {
+    //   printf("recs for id==996 = %d\n", block_header->num_of_rec);
+    // }
     for (int i = 0 ; i < block_header->num_of_rec ; i++) {
       int offset = i*sizeof(Record);
       memcpy(&temp_rec, data + offset, sizeof(Record));
@@ -651,6 +648,7 @@ HT_ErrorCode HT_PrintAllEntries(int indexDesc, int *id) {
         printRecord(temp_rec);
       }
     }
+    CALL_BF(BF_UnpinBlock(block));
   }
   else {
     int blocks_num;
@@ -660,39 +658,15 @@ HT_ErrorCode HT_PrintAllEntries(int indexDesc, int *id) {
       void* data = BF_Block_GetData(block); 
       HT_block_info* block_header = data + BF_BLOCK_SIZE - sizeof(HT_block_info);
       Record temp_rec;
-      // if (block_header->num_of_rec == 0) {
-      //   printf("block number for recs=0 : %d\n", i);
-      // }
       for (int j = 0 ; j < block_header->num_of_rec ; j++) {
         int offset = j*sizeof(Record);
         memcpy(&temp_rec, data + offset, sizeof(Record));
-        // printf("Block %d :", i);
+        printf("Block %d :", i);
         printRecord(temp_rec);
-
-        // BF_Block* new_block;
-        // BF_Block_Init(&new_block);
-        // for (int k = 0 ; k < blocks_num ; k++) {
-        //   CALL_BF(BF_GetBlock(file_desc, k, new_block));
-        //   data = BF_Block_GetData(new_block); 
-        //   HT_block_info* new_block_header = data + BF_BLOCK_SIZE - sizeof(HT_block_info);
-        //   Record new_temp_rec;
-        //     for (int p = 0 ; p < new_block_header->num_of_rec ; p++) {
-        //       int new_offset = p*sizeof(Record);
-        //       memcpy(&new_temp_rec, data + new_offset, sizeof(Record));
-        //       if (temp_rec.id == new_temp_rec.id && k != i) {
-        //         printf("OX EGINE MALAKIA\n");
-        //       }
-        //     }
-        //   CALL_BF(BF_UnpinBlock(block));
-        // }
-        // BF_Block_Destroy(&new_block);
-
-
       }
       CALL_BF(BF_UnpinBlock(block));
     }
-    // BF_Block_Destroy(&block);
   }
-
+  BF_Block_Destroy(&block);
   return HT_OK;
 }
