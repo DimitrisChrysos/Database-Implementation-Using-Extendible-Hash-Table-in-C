@@ -67,27 +67,29 @@ HT_ErrorCode HT_CreateIndex(const char *filename) {
   // επίσης ενημερώνουμε το header του βασικού αρχείου
   BF_Block *HT_block;
   BF_Block_Init(&HT_block);
-  char hash_table_name[sizeof(filename) + 3];
-  strcpy(hash_table_name, filename);
-  for (int i = 0 ; i < strlen(hash_table_name) ; i++) {
-    if (hash_table_name[i] == '.') {
-      hash_table_name[i] = '_';
-      hash_table_name[i+1] = 'H';
-      hash_table_name[i+2] = 'T';
-      hash_table_name[i+3] = '.';
-      hash_table_name[i+4] = 'd';
-      hash_table_name[i+5] = 'b';
-      break;
-    }
-  }
-  int file_desc_HT;
-  CALL_BF(BF_CreateFile(hash_table_name));
-  CALL_BF(BF_OpenFile(hash_table_name, &file_desc_HT));
-  header->file_descriptor_HT = file_desc_HT;
-  printf("file_desc = %d | file_desc_HT = %d\n", file_desc, file_desc_HT);
+  // char hash_table_name[sizeof(filename) + 3];
+  // strcpy(hash_table_name, filename);
+  // for (int i = 0 ; i < strlen(hash_table_name) ; i++) {
+  //   if (hash_table_name[i] == '.') {
+  //     hash_table_name[i] = '_';
+  //     hash_table_name[i+1] = 'H';
+  //     hash_table_name[i+2] = 'T';
+  //     hash_table_name[i+3] = '.';
+  //     hash_table_name[i+4] = 'd';
+  //     hash_table_name[i+5] = 'b';
+  //     break;
+  //   }
+  // }
+  // int file_desc_HT;
+  // CALL_BF(BF_CreateFile(hash_table_name));
+  // CALL_BF(BF_OpenFile(hash_table_name, &file_desc_HT));
+  // header->file_descriptor_HT = file_desc_HT;
+  // printf("file_desc = %d | file_desc_HT = %d\n", file_desc, file_desc_HT);
 
+
+  CALL_BF(BF_OpenFile(filename, &file_desc));
   // Αρχικοποίηση 1ου block του αρχείου HT
-  CALL_BF(BF_AllocateBlock(file_desc_HT, HT_block));
+  CALL_BF(BF_AllocateBlock(file_desc, HT_block));
   data = BF_Block_GetData(HT_block);
   memcpy(data, hash_table, 2*sizeof(int));
   header->hash_table = data;
@@ -99,8 +101,8 @@ HT_ErrorCode HT_CreateIndex(const char *filename) {
 
   // Κλείσιμο του αρχείου HT
   BF_Block_Destroy(&HT_block);
-  CALL_BF(BF_CloseFile(file_desc_HT));
-
+  // CALL_BF(BF_CloseFile(file_desc_HT));
+  CALL_BF(BF_CloseFile(file_desc));
 
 
   // Κλείσιμο αρχείου fileName και αποδέσμευση μνήμης
@@ -120,8 +122,9 @@ HT_ErrorCode HT_OpenIndex(const char *fileName, int *indexDesc){
   CALL_BF(BF_OpenFile(fileName, &file_desc));
 
   // Ανοίγουμε το αρχείο HT
-  int file_desc_HT;
-  CALL_BF(BF_OpenFile(fileName, &file_desc_HT));
+  // int file_desc_HT;
+  // CALL_BF(BF_OpenFile(fileName, &file_desc_HT));
+  // printf("file_desc = %d | file_desc_HT = %d\n", file_desc, file_desc_HT);
 
   // Παίρνουμε το πρώτο block και τα μεταδεδομένα του αρχείου
   BF_Block *block;
@@ -133,7 +136,7 @@ HT_ErrorCode HT_OpenIndex(const char *fileName, int *indexDesc){
 
   // Ενημερώνουμε το file descriptor
   header->file_desc = file_desc;
-  header->file_descriptor_HT = file_desc_HT;
+  // header->file_descriptor_HT = file_desc_HT;
 
   // Βάζουμε τη κεφαλίδα του αρχείου στον πίνακα με τα ανοικτά αρχεία
   *indexDesc = open_files_counter;

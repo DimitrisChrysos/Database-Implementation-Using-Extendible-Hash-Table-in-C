@@ -41,7 +41,7 @@ void print_HashTable(int* hash_table, int hash_array_size) {
 void double_hash(void* header_inf) {
 
     HT_info* header_info = header_inf;
-    print_HashTable(header_info->hash_table, header_info->size_of_hash_table);
+    // print_HashTable(header_info->hash_table, header_info->size_of_hash_table);
     int hash_array_size = header_info->size_of_hash_table;
     int **hash_array = &(header_info->hash_table);
     // Αντέγραψε το αρχικό hash_array
@@ -49,13 +49,13 @@ void double_hash(void* header_inf) {
     for (int i = 0 ; i < hash_array_size ; i++) {
         temp_hash_array[i] = (*hash_array)[i];
     } 
-    
+    printf("file_desc = %d | file_desc_HT = %d\n", header_info->file_desc, header_info->file_descriptor_HT);
     // Έλεγξε αν υπάρχει διαθέσιμος χώρος στο block του Hash Table, στο αρχείο HT
     // Αν υπάρχει απλά συνέχισε από κάτω
     // Αλλιώς όσα ακόμα block χρειάζονται
-    printf("edo gamiete\n");
+    // printf("edo gamiete\n");
     int HT_blocks = header_info->count_blocks_for_HT;
-    printf("edo gamiete\n");
+    // printf("edo gamiete\n");
     int cur_hash_table_sz = (header_info->size_of_hash_table)*sizeof(int);
     float blocks_needed_for_HT = (float)(2*cur_hash_table_sz) / (float)BF_BLOCK_SIZE;
     int bl_nd = (int)blocks_needed_for_HT;
@@ -67,9 +67,9 @@ void double_hash(void* header_inf) {
         BF_Block* alloc_block;
         BF_Block_Init(&alloc_block);
         for (int i = 0 ; i < more_blocks_needed ; i++) {
-            CALL_BF(BF_AllocateBlock(header_info->file_descriptor_HT, alloc_block));
+            BF_AllocateBlock(header_info->file_desc, alloc_block);
             BF_Block_SetDirty(alloc_block);
-            CALL_BF(BF_UnpinBlock(alloc_block));
+            BF_UnpinBlock(alloc_block);
         }
         BF_Block_Destroy(&alloc_block);
     }
@@ -94,7 +94,7 @@ void double_hash(void* header_inf) {
         }
     }
     free(temp_hash_array);
-    print_HashTable(header_info->hash_table, 2* (header_info->size_of_hash_table));
+    // print_HashTable(header_info->hash_table, 2* (header_info->size_of_hash_table));
 }
 
 void dec2bin_string(unsigned int dec, char* bin_string);
