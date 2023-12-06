@@ -105,8 +105,10 @@ int main() {
   CALL_OR_DIE(HT_PrintAllEntries(indexDesc, NULL));
 
   CALL_OR_DIE(HT_CloseFile(indexDesc));
-  // CALL_OR_DIE(HT_OpenIndex(FILE_NAME, &indexDesc)); 
+  CALL_OR_DIE(HT_OpenIndex(FILE_NAME, &indexDesc)); 
   // CALL_OR_DIE(HT_PrintAllEntries(indexDesc, NULL));
+  int dec=996;
+  CALL_OR_DIE(HT_PrintAllEntries(indexDesc, &dec));
 
   BF_Close();
 }
