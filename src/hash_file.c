@@ -666,8 +666,28 @@ HT_ErrorCode HT_PrintAllEntries(int indexDesc, int *id) {
       for (int j = 0 ; j < block_header->num_of_rec ; j++) {
         int offset = j*sizeof(Record);
         memcpy(&temp_rec, data + offset, sizeof(Record));
-        printf("Block %d :", i);
+        // printf("Block %d :", i);
         printRecord(temp_rec);
+
+        // BF_Block* new_block;
+        // BF_Block_Init(&new_block);
+        // for (int k = 0 ; k < blocks_num ; k++) {
+        //   CALL_BF(BF_GetBlock(file_desc, k, new_block));
+        //   data = BF_Block_GetData(new_block); 
+        //   HT_block_info* new_block_header = data + BF_BLOCK_SIZE - sizeof(HT_block_info);
+        //   Record new_temp_rec;
+        //     for (int p = 0 ; p < new_block_header->num_of_rec ; p++) {
+        //       int new_offset = p*sizeof(Record);
+        //       memcpy(&new_temp_rec, data + new_offset, sizeof(Record));
+        //       if (temp_rec.id == new_temp_rec.id && k != i) {
+        //         printf("OX EGINE MALAKIA\n");
+        //       }
+        //     }
+        //   CALL_BF(BF_UnpinBlock(block));
+        // }
+        // BF_Block_Destroy(&new_block);
+
+
       }
       CALL_BF(BF_UnpinBlock(block));
     }
