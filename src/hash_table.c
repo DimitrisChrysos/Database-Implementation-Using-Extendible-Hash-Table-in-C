@@ -10,6 +10,14 @@
 #define OFFSET_BASIS 2166136261ul
 #define FNV_PRIME 16777619ul
 
+#define CALL_BF(call)       \
+{                           \
+  BF_ErrorCode code = call; \
+  if (code != BF_OK) {         \
+    BF_PrintError(code);    \
+    return HT_ERROR;        \
+  }                         \
+}
 
 uint32_t hash(char* data, size_t bytes)
 {
@@ -33,6 +41,7 @@ void print_HashTable(int* hash_table, int hash_array_size) {
 void double_hash(void* header_inf) {
 
     HT_info* header_info = header_inf;
+    print_HashTable(header_info->hash_table, header_info->size_of_hash_table);
     int hash_array_size = header_info->size_of_hash_table;
     int **hash_array = &(header_info->hash_table);
     // Αντέγραψε το αρχικό hash_array
@@ -40,10 +49,36 @@ void double_hash(void* header_inf) {
     for (int i = 0 ; i < hash_array_size ; i++) {
         temp_hash_array[i] = (*hash_array)[i];
     } 
+    
+    // Έλεγξε αν υπάρχει διαθέσιμος χώρος στο block του Hash Table, στο αρχείο HT
+    // Αν υπάρχει απλά συνέχισε από κάτω
+    // Αλλιώς όσα ακόμα block χρειάζονται
+    printf("edo gamiete\n");
+    int HT_blocks = header_info->count_blocks_for_HT;
+    printf("edo gamiete\n");
+    int cur_hash_table_sz = (header_info->size_of_hash_table)*sizeof(int);
+    float blocks_needed_for_HT = (float)(2*cur_hash_table_sz) / (float)BF_BLOCK_SIZE;
+    int bl_nd = (int)blocks_needed_for_HT;
+    if (blocks_needed_for_HT > (float)bl_nd) {
+        bl_nd++;
+    }
+    if (HT_blocks < bl_nd) {
+        int more_blocks_needed = bl_nd - HT_blocks;
+        BF_Block* alloc_block;
+        BF_Block_Init(&alloc_block);
+        for (int i = 0 ; i < more_blocks_needed ; i++) {
+            CALL_BF(BF_AllocateBlock(header_info->file_descriptor_HT, alloc_block));
+            BF_Block_SetDirty(alloc_block);
+            CALL_BF(BF_UnpinBlock(alloc_block));
+        }
+        BF_Block_Destroy(&alloc_block);
+    }
+    // printf("edo gamiete\n");
+    // header_info->HT_header->positions = 2*(header_info->HT_header->positions);
+
 
     // Διπλασίασε το αρχικό array
     *hash_array = realloc(*hash_array, 2*hash_array_size*sizeof(int));
-
     // Διόρθωσε τις καινούργιες θέσεις να δείχνουν στα σωστά block μετά το διπλασιασμό
     // Αν ο αριθμός block είναι -1 σημαίνει ότι δεν δείχνει σε block
     for (int i = 0 ; i < hash_array_size ; i++) {
@@ -59,6 +94,7 @@ void double_hash(void* header_inf) {
         }
     }
     free(temp_hash_array);
+    print_HashTable(header_info->hash_table, 2* (header_info->size_of_hash_table));
 }
 
 void dec2bin_string(unsigned int dec, char* bin_string);

@@ -15,6 +15,7 @@ typedef struct Record {
 
 typedef struct {
 	int positions;
+	// int count_blocks_for_HT;
 } HT_file_header;
 
 /* Η δομή HΤ_info κρατάει μεταδεδομένα που σχετίζονται με το αρχείο επεκτατικού κατακερματισμού*/
@@ -24,8 +25,10 @@ typedef struct {
 	int total_rec;   // Συνολικός αριθμός records που χωράνε στο αρχείο σωρού
     void* last_block; // Δείκτης που δείχνει κάθε φορά στο τελευταίο block
 	int size_of_hash_table;
-	// int file_descriptor_HT;
+	int file_descriptor_HT;
 	int* hash_table;
+	int count_blocks_for_HT;
+	HT_file_header* HT_header;
 } HT_info;
 
 /* Η δομή HT_block_info κρατάει μεταδεδομένα του block ενός αρχείου επεκτατικού κατακερματισμού*/
