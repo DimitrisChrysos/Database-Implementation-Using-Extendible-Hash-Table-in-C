@@ -13,10 +13,10 @@ typedef struct Record {
 	char city[20];
 } Record;
 
-// typedef struct {
-// 	int positions;
-// 	// int count_blocks_for_HT;
-// } HT_file_header;
+typedef struct {
+	int next_ht_block_id;
+	int num_of_indices;
+} HT_blocks;
 
 /* Η δομή HΤ_info κρατάει μεταδεδομένα που σχετίζονται με το αρχείο επεκτατικού κατακερματισμού*/
 typedef struct {
@@ -28,6 +28,7 @@ typedef struct {
 	// int file_descriptor_HT;
 	int* hash_table;
 	int count_blocks_for_HT;
+	int last_HT_block_id;
 	// HT_file_header* HT_header;
 } HT_info;
 

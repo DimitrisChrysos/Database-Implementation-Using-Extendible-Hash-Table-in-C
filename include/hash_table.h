@@ -14,6 +14,11 @@ uint32_t hash(char* data, size_t bytes);
  */
 void print_HashTable(int* hash_table, int hash_array_size);
 
+/*
+ * Αποθηκεύει το Hash Table σε blocks
+ */
+void save_Hash_table(void* header_inf);
+
 /* 
  * Διπλασίασε τον πίνακα hash_array
  * Παίρνει ορίσματα, τη διεύθυνση του πίνακα Hash Table, και το μέγεθος του

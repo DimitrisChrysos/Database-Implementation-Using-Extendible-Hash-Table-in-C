@@ -38,6 +38,69 @@ void print_HashTable(int* hash_table, int hash_array_size) {
     }
 }
 
+void save_Hash_table(void* header_inf) {
+    
+    // Πάρε το πρώτο block του Hash Table
+    HT_info* header_info = header_inf;
+    BF_Block* block;
+    BF_Block_Init(&block);
+    BF_GetBlock(header_info->file_desc, 1, block);
+    void *data = BF_Block_GetData(block);
+    int offset = BF_BLOCK_SIZE - sizeof(HT_blocks);
+    HT_blocks *htb = data + offset;
+    htb->num_of_indices = 0;
+
+    // Αποθήκευσε το Hash Tabble
+    int total_indeces = header_info->size_of_hash_table;
+    int max_indeces_per_block = (BF_BLOCK_SIZE - sizeof(HT_blocks)) / sizeof(int);
+    int indeces_inserted = 0;
+    if (max_indeces_per_block < total_indeces) {
+        while (1) {
+            for (int i = 0 ; i < max_indeces_per_block ; i++) {
+                memcpy(data + i*sizeof(int), &(header_info->hash_table[i]), sizeof(int));
+                htb->num_of_indices++;
+                indeces_inserted++;
+                if (indeces_inserted == total_indeces) {
+                    htb->next_ht_block_id = -1;
+                    BF_Block_SetDirty(block);
+                    BF_UnpinBlock(block);
+                    break;
+                }
+            }
+            if (indeces_inserted == total_indeces) {
+                break;
+            }
+            if (htb->next_ht_block_id == -1) {
+                int new_block;
+                BF_GetBlockCounter(header_info->file_desc, &new_block);
+                htb->next_ht_block_id = new_block;
+                BF_Block_SetDirty(block);
+                BF_UnpinBlock(block);
+                BF_AllocateBlock(header_info->file_desc, block);
+                data = BF_Block_GetData(block);
+                htb = data + offset;
+            }
+            else {
+                BF_GetBlock(header_info->file_desc, htb->next_ht_block_id, block);
+                data = BF_Block_GetData(block);
+                htb = data + offset;
+            }
+
+        }
+    }
+    else {
+        for (int i = 0 ; i < total_indeces ; i++) {
+            memcpy(data + i*sizeof(int), &(header_info->hash_table[i]), sizeof(int));
+            htb->num_of_indices++;
+            indeces_inserted++;
+        }
+    }
+
+    BF_Block_SetDirty(block);
+    BF_UnpinBlock(block);
+    BF_Block_Destroy(&block);
+}
+
 void double_hash(void* header_inf) {
 
     HT_info* header_info = header_inf;
@@ -48,28 +111,6 @@ void double_hash(void* header_inf) {
     int* temp_hash_array = (int*)malloc(hash_array_size*sizeof(int));
     for (int i = 0 ; i < hash_array_size ; i++) {
         temp_hash_array[i] = (*hash_array)[i];
-    }
-    
-    // Έλεγξε αν υπάρχει διαθέσιμος χώρος στο block του Hash Table, στο αρχείο HT
-    // Αν υπάρχει απλά συνέχισε από κάτω
-    // Αλλιώς όσα ακόμα block χρειάζονται
-    int HT_blocks = header_info->count_blocks_for_HT;
-    int cur_hash_table_sz = (header_info->size_of_hash_table)*sizeof(int);
-    float blocks_needed_for_HT = (float)(2*cur_hash_table_sz) / (float)BF_BLOCK_SIZE;
-    int bl_nd = (int)blocks_needed_for_HT;
-    if (blocks_needed_for_HT > (float)bl_nd) {
-        bl_nd++;
-    }
-    if (HT_blocks < bl_nd) {
-        int more_blocks_needed = bl_nd - HT_blocks;
-        BF_Block* alloc_block;
-        BF_Block_Init(&alloc_block);
-        for (int i = 0 ; i < more_blocks_needed ; i++) {
-            BF_AllocateBlock(header_info->file_desc, alloc_block);
-            BF_Block_SetDirty(alloc_block);
-            BF_UnpinBlock(alloc_block);
-        }
-        BF_Block_Destroy(&alloc_block);
     }
 
     // Διπλασίασε το αρχικό array
@@ -89,6 +130,7 @@ void double_hash(void* header_inf) {
         }
     }
     free(temp_hash_array);
+
 }
 
 void dec2bin_string(unsigned int dec, char* bin_string);
