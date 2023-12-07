@@ -51,6 +51,7 @@ HT_ErrorCode HT_CreateIndex(const char *filename) {
   header->last_HT_block_id = 1;
   header->hash_table = data;
   header->count_blocks_for_HT = 1;
+  header->has_changed = 0;
 
   BF_Block_SetDirty(block);
   CALL_BF(BF_UnpinBlock(block));
@@ -113,6 +114,7 @@ HT_ErrorCode HT_OpenIndex(const char *fileName, int *indexDesc){
   open_files[*indexDesc] = *header;
   
   // Φτιάχνουμε το Hash Table
+  
   header->hash_table = (int*)malloc((header->size_of_hash_table) * sizeof(int));
   open_files[*indexDesc].hash_table = header->hash_table;
   if (header->total_rec == 0) {
@@ -145,73 +147,9 @@ HT_ErrorCode HT_OpenIndex(const char *fileName, int *indexDesc){
       htb = data + offset;
     }
   }
-  
+
   // Αποδεσμεύσουμε το block
   BF_Block_Destroy(&block);
-
-  /////////////////////////////////////////////
-  // printf("1111\n");
-  // print_HashTable(header->hash_table, header->size_of_hash_table);
-  // printf("2222\n");
-
-  // Έλεγχος για το αν έχει recs το αρχείο και τότε 
-  // κατάλληλη αρχικοποίηση των μεταδεδομένων του αρχείου 
-  // int blocks_Num;
-  // BF_GetBlockCounter(header->file_desc, &blocks_Num);
-  // printf("blocks_Num = %d\n", blocks_Num);
-  // if (blocks_Num > 1) {
-
-  //   // Βάζουμε το τελευταίο block
-  //   BF_Block* last_block;
-  //   BF_Block_Init(&last_block);
-  //   CALL_BF(BF_GetBlock(header->file_desc, blocks_Num - 1, block));
-  //   data = BF_Block_GetData(block);
-  //   header->last_block = block;
-  //   BF_Block_SetDirty(last_block);
-  //   CALL_BF(BF_UnpinBlock(last_block));
-  // }
-  /////////////////////////////////////////////
-
-
-
-  
-  // int blocks_num;
-  // CALL_BF(BF_GetBlockCounter(file_desc, &blocks_num));
-  // if (blocks_num > 2) {
-  //   BF_Block * last_block;
-  //   BF_Block_Init(&last_block);
-  //   for (int i = blocks_num - 1 ; i > 0 ; i--) {
-  //     printf("i = %d\n",i);
-  //     CALL_BF(BF_GetBlock(file_desc, i, last_block));
-  //     void* data = BF_Block_GetData(last_block); 
-  //     HT_block_info* block_header = data + BF_BLOCK_SIZE - sizeof(HT_block_info);
-  //     if (block_header->is_block_info == 1) {
-        
-
-  //       header->last_block = last_block;
-  //       BF_Block_SetDirty(last_block);
-  //       CALL_BF(BF_GetBlock(header->file_desc, 0, last_block));
-  //       BF_Block_SetDirty(last_block);
-  //       CALL_BF(BF_UnpinBlock(last_block));
-  //       // CALL_BF(BF_UnpinBlock(last_block));
-  //       // printf("ey\n");
-  //       break;
-  //     }
-  //     else {
-  //       CALL_BF(BF_UnpinBlock(last_block));
-  //       continue;
-  //     }
-  //   }
-  // }
-
-  
-  // Αποδεσμεύσουμε το block
-  // BF_Block_Destroy(&last_block);
-  
-
-
-  
-
   return HT_OK;
 }
 
@@ -230,7 +168,10 @@ HT_ErrorCode HT_CloseFile(int indexDesc) {
   HT_info* temp_header = data;
   
   // Κάνε save το Hash Table
-  save_Hash_table(header_info);
+  if (header_info->has_changed == 1) {
+    save_Hash_table(header_info);
+    header_info->has_changed = 0;
+  }
 
   // Ξανά αρχικοποίησε το header πριν το close
   temp_header->count_blocks_for_HT = header_info->count_blocks_for_HT;
@@ -241,6 +182,7 @@ HT_ErrorCode HT_CloseFile(int indexDesc) {
   temp_header->last_HT_block_id = header_info->last_HT_block_id;
   temp_header->size_of_hash_table = header_info->size_of_hash_table;
   temp_header->total_rec = header_info->total_rec;
+  open_files_counter--;
   
   // Αποδεσμεύουμε το header block
   free(header_info->hash_table);
@@ -248,15 +190,9 @@ HT_ErrorCode HT_CloseFile(int indexDesc) {
   CALL_BF(BF_UnpinBlock(block));
   BF_Block_Destroy(&block);
 
-  // Αποδεσμεύουμε το τελευταίο block
-  // BF_Block *last_block = header_info->last_block;
-  // BF_Block_SetDirty(last_block);
-  // printf("111111\n");
-  // CALL_BF(BF_UnpinBlock(last_block));
-  // printf("222222\n");
-  // BF_Block_Destroy(&last_block);
-
   // Κλείσε το αρχείο
+  BF_Block_SetDirty(header_info->last_block);
+  CALL_BF(BF_UnpinBlock(header_info->last_block));
   CALL_BF(BF_CloseFile(file_desc));
   
   return HT_OK;
@@ -267,6 +203,7 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
 
   // Παίρνουμε τα μεταδεδομένα του αρχείου
   HT_info* header_info = &open_files[indexDesc];
+  header_info->has_changed = 1;
   int file_desc = header_info->file_desc;
 
   // Παίρνουμε το block με τα μεταδεδομένα του αρχείου
@@ -744,6 +681,49 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
   return HT_OK;
 }
 
+HT_ErrorCode HashStatistics(int indexDesc) {
+  
+  // Παίρνουμε τα μεταδεδομένα του αρχείου
+  HT_info* header_info = &open_files[indexDesc];
+  int file_desc = header_info->file_desc;
+
+  int num_of_blocks;
+  BF_GetBlockCounter(indexDesc, &num_of_blocks);
+  int counter = 1;
+  BF_Block * block;
+  BF_Block_Init(&block);
+  int min = 99;
+  int max = -1;
+  int sum = 0;
+  HT_block_info* block_header;
+  for (int i = 2; i < num_of_blocks; i++) {
+    CALL_BF(BF_GetBlock(indexDesc, i, block));
+    void * data = BF_Block_GetData(block);
+    HT_block_info* block_header = data + BF_BLOCK_SIZE - sizeof(HT_block_info);
+    if (block_header->is_block_info != 1)  {
+      counter++;
+      break; 
+    }
+    if (block_header->num_of_rec > max) {
+      max = block_header->num_of_rec;
+    }
+    if (block_header->num_of_rec < min) {
+      min = block_header->num_of_rec;
+    }
+    sum += block_header->num_of_rec;
+    BF_UnpinBlock(block);
+  }
+  BF_Block_Destroy(&block);
+  printf("count_blocks_for_HT = %d\n", header_info->count_blocks_for_HT);
+  float avg = (float) sum / (float) (num_of_blocks - header_info->count_blocks_for_HT);
+  printf("File %d has:\n", indexDesc);
+  printf("%d total blocks\n", num_of_blocks);
+  printf("%d minimum records in one block\n", min);
+  printf("%d maximum records in one block\n", max);
+  printf("%f records per block, on average\n", avg);
+  return HT_OK;
+}
+
 void printRecord(Record record){
     printf("(%d,%s,%s,%s)\n",record.id,record.name,record.surname,record.city);
 }
@@ -771,8 +751,8 @@ HT_ErrorCode HT_PrintAllEntries(int indexDesc, int *id) {
         printRecord(temp_rec);
       }
     }
-    BF_Block_SetDirty(block);
-    CALL_BF(BF_UnpinBlock(block));
+    // BF_Block_SetDirty(block);
+    // CALL_BF(BF_UnpinBlock(block));
   }
   else {
 
@@ -794,7 +774,8 @@ HT_ErrorCode HT_PrintAllEntries(int indexDesc, int *id) {
         CALL_BF(BF_UnpinBlock(block));
       }
       else {
-        CALL_BF(BF_UnpinBlock(block));
+        // BF_Block_SetDirty(block);
+        // CALL_BF(BF_UnpinBlock(block));
         continue;
       }
     }

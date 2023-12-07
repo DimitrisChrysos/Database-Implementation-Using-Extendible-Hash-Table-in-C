@@ -28,6 +28,7 @@ typedef struct {
 	int* hash_table;
 	int count_blocks_for_HT;
 	int last_HT_block_id;
+	int has_changed;
 } HT_info;
 
 /* Η δομή HT_block_info κρατάει μεταδεδομένα του block ενός αρχείου επεκτατικού κατακερματισμού*/
@@ -97,5 +98,7 @@ HT_ErrorCode HT_PrintAllEntries(
 	int *id 				/* τιμή του πεδίου κλειδιού προς αναζήτηση */
 	);
 
+
+HT_ErrorCode HashStatistics(int indexDesc);
 
 #endif // HASH_FILE_H

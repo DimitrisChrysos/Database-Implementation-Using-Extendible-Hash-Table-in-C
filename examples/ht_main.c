@@ -84,53 +84,29 @@ int main() {
     r = rand() % 10;
     memcpy(record.city, cities[r], strlen(cities[r]) + 1);
 
-
-    // if (id == 1000) {
-    //   break;
-    // }
-    // if (id > 962) {
-    //   break;
-    // }
-    // printf("%d\n", id);
     CALL_OR_DIE(HT_InsertEntry(indexDesc, record));
   }
 
   printf("RUN PrintAllEntries\n");
-  // int id = rand() % RECORDS_NUM;
-  // printf("id = %d\n", id);
-  // CALL_OR_DIE(HT_PrintAllEntries(indexDesc, &id));
-  int dec=996;
-  // CALL_OR_DIE(HT_PrintAllEntries(indexDesc, NULL));
-  // CALL_OR_DIE(HT_PrintAllEntries(indexDesc, NULL));
-  // CALL_OR_DIE(HT_PrintAllEntries(indexDesc, &dec));
 
+  int dec=521;
+  CALL_OR_DIE(HT_PrintAllEntries(indexDesc, NULL));
+  CALL_OR_DIE(HT_PrintAllEntries(indexDesc, &dec));
+  CALL_OR_DIE(HashStatistics(indexDesc));
   CALL_OR_DIE(HT_CloseFile(indexDesc));
+
+  printf("\n\n\n\n");
   CALL_OR_DIE(HT_OpenIndex(FILE_NAME, &indexDesc)); 
-  // CALL_OR_DIE(HT_PrintAllEntries(indexDesc, NULL));
-  // int dec=745;
-  // CALL_OR_DIE(HT_PrintAllEntries(indexDesc, &dec));
-
-
-  // record.id = 745;
-  // r = rand() % 12;
-  // memcpy(record.name, names[r], strlen(names[r]) + 1);
-  // r = rand() % 12;
-  // memcpy(record.surname, surnames[r], strlen(surnames[r]) + 1);
-  // r = rand() % 10;
-  // memcpy(record.city, cities[r], strlen(cities[r]) + 1);
-  // CALL_OR_DIE(HT_InsertEntry(indexDesc, record));
-  // CALL_OR_DIE(HT_PrintAllEntries(indexDesc, &dec));
-  // CALL_OR_DIE(HT_PrintAllEntries(indexDesc, NULL));
-
+  CALL_OR_DIE(HT_PrintAllEntries(indexDesc, &dec));
+  CALL_OR_DIE(HashStatistics(indexDesc));
   CALL_OR_DIE(HT_CloseFile(indexDesc));
-  CALL_OR_DIE(HT_OpenIndex(FILE_NAME, &indexDesc));
-  // CALL_OR_DIE(HT_PrintAllEntries(indexDesc, NULL));
-  // CALL_OR_DIE(HT_PrintAllEntries(indexDesc, &dec));
 
-  CALL_OR_DIE(HT_CloseFile(indexDesc));
+  printf("\n\n\n\n");
   CALL_OR_DIE(HT_OpenIndex(FILE_NAME, &indexDesc));
   CALL_OR_DIE(HT_PrintAllEntries(indexDesc, NULL));
   CALL_OR_DIE(HT_PrintAllEntries(indexDesc, &dec));
+  CALL_OR_DIE(HashStatistics(indexDesc));
+  CALL_OR_DIE(HT_CloseFile(indexDesc));
 
   BF_Close();
 }
