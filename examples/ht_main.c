@@ -87,79 +87,6 @@ int main() {
     CALL_OR_DIE(HT_InsertEntry(indexDesc, record));
   }
 
-
-  // printf("RUN PrintAllEntries\n");
-
-  // int dec=521;
-  // CALL_OR_DIE(HT_PrintAllEntries(indexDesc, NULL));
-  // CALL_OR_DIE(HT_PrintAllEntries(indexDesc, &dec));
-  // CALL_OR_DIE(HashStatistics(indexDesc));
-  // CALL_OR_DIE(HT_CloseFile(indexDesc));
-
-  // printf("\n\n\n\n");
-  // CALL_OR_DIE(HT_OpenIndex(FILE_NAME, &indexDesc));
-  // // printf("pou eimaste gtpm?\n");
-  // CALL_OR_DIE(HT_CreateIndex("data2.db"));
-  // int id2;
-  // CALL_OR_DIE(HT_OpenIndex("data2.db", &id2));
-  // // CALL_OR_DIE(HT_CloseFile(id2));
-
-  // CALL_OR_DIE(HT_PrintAllEntries(indexDesc, NULL));
-  // // CALL_OR_DIE(HT_PrintAllEntries(indexDesc, &dec));
-
-  // // record.id = 683;
-  // // r = rand() % 12;
-  // // memcpy(record.name, names[r], strlen(names[r]) + 1);
-  // // r = rand() % 12;
-  // // memcpy(record.surname, surnames[r], strlen(surnames[r]) + 1);
-  // // r = rand() % 10;
-  // // memcpy(record.city, cities[r], strlen(cities[r]) + 1);
-  // // CALL_OR_DIE(HT_InsertEntry(indexDesc, record));
-  // // CALL_OR_DIE(HT_PrintAllEntries(indexDesc, &record.id));
-  
-
-  // printf("Insert Entries\n");
-  // for (int id = 1001; id < 2000; ++id) {
-  //   // create a record
-  //   record.id = id;
-  //   r = rand() % 12;
-  //   memcpy(record.name, names[r], strlen(names[r]) + 1);
-  //   r = rand() % 12;
-  //   memcpy(record.surname, surnames[r], strlen(surnames[r]) + 1);
-  //   r = rand() % 10;
-  //   memcpy(record.city, cities[r], strlen(cities[r]) + 1);
-
-  //   CALL_OR_DIE(HT_InsertEntry(indexDesc, record));
-  // }
-  // CALL_OR_DIE(HT_PrintAllEntries(indexDesc, NULL));
-  // // CALL_OR_DIE(HT_PrintAllEntries(indexDesc, &dec));
-
-  // for (int id = 0; id < 51; ++id) {
-  //   // create a record
-  //   record.id = id;
-  //   r = rand() % 12;
-  //   memcpy(record.name, names[r], strlen(names[r]) + 1);
-  //   r = rand() % 12;
-  //   memcpy(record.surname, surnames[r], strlen(surnames[r]) + 1);
-  //   r = rand() % 10;
-  //   memcpy(record.city, cities[r], strlen(cities[r]) + 1);
-
-  //   CALL_OR_DIE(HT_InsertEntry(id2, record));
-  // }
-
-  
-  // // CALL_OR_DIE(HT_CloseFile(indexDesc));
-
-
-  // // printf("\n\n\n\n");
-  // // CALL_OR_DIE(HT_OpenIndex(FILE_NAME, &indexDesc));
-  // // dec=444;
-  // CALL_OR_DIE(HT_PrintAllEntries(id2, NULL));
-  // CALL_OR_DIE(HashStatistics(id2));
-  // // CALL_OR_DIE(HT_PrintAllEntries(indexDesc, &dec));
-  // CALL_OR_DIE(HT_CloseFile(id2));
-  // CALL_OR_DIE(HT_CloseFile(indexDesc));
-
   printf("RUN PrintAllEntries\n");
   printf("*************************************************************\n");
 
@@ -233,6 +160,40 @@ int main() {
   CALL_OR_DIE(HT_PrintAllEntries(indexDesc, &dec));
   printf("\n");
   CALL_OR_DIE(HashStatistics(indexDesc));
+  CALL_OR_DIE(HT_CloseFile(indexDesc));
+  printf("*************************************************************\n");
+
+
+  printf("\n\n\n\n");
+  printf("TEST 5\n");
+  printf("*************************************************************\n");
+  CALL_OR_DIE(HT_OpenIndex(FILE_NAME, &indexDesc));
+  CALL_OR_DIE(HT_PrintAllEntries(indexDesc, NULL));
+  printf("\n\n");
+  CALL_OR_DIE(HT_CreateIndex("data2.db"));
+  int indexDesc2;
+  CALL_OR_DIE(HT_OpenIndex("data2.db", &indexDesc2));
+  for (int id = 0; id < 50; ++id) {
+  // create a record
+    record.id = id;
+    r = rand() % 12;
+    memcpy(record.name, names[r], strlen(names[r]) + 1);
+    r = rand() % 12;
+    memcpy(record.surname, surnames[r], strlen(surnames[r]) + 1);
+    r = rand() % 10;
+    memcpy(record.city, cities[r], strlen(cities[r]) + 1);
+
+    CALL_OR_DIE(HT_InsertEntry(indexDesc2, record));
+  }
+  CALL_OR_DIE(HT_PrintAllEntries(indexDesc2, NULL));
+  printf("\n");
+  int p = 42;
+  CALL_OR_DIE(HT_PrintAllEntries(indexDesc2, &p));
+  printf("\n");
+  CALL_OR_DIE(HashStatistics(indexDesc2));
+  printf("\n\n\n");
+
+  CALL_OR_DIE(HT_CloseFile(indexDesc2));
   CALL_OR_DIE(HT_CloseFile(indexDesc));
   printf("*************************************************************\n");
 
