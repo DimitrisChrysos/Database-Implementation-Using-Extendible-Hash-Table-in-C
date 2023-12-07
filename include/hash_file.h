@@ -25,11 +25,9 @@ typedef struct {
 	int total_rec;   // Συνολικός αριθμός records που χωράνε στο αρχείο σωρού
     void* last_block; // Δείκτης που δείχνει κάθε φορά στο τελευταίο block
 	int size_of_hash_table;
-	// int file_descriptor_HT;
 	int* hash_table;
 	int count_blocks_for_HT;
 	int last_HT_block_id;
-	// HT_file_header* HT_header;
 } HT_info;
 
 /* Η δομή HT_block_info κρατάει μεταδεδομένα του block ενός αρχείου επεκτατικού κατακερματισμού*/
@@ -37,8 +35,6 @@ typedef struct {
     int num_of_rec;	// Αριθμός records στο συγκεκριμένο block
 	int capacity;   // Πόσα records χωράνε τη συγκεκριμένη στιγμή στο block
 	int local_depth;	// Τοπικό βάθος
-	void* next_block_header;
-	int next_block;
 	int is_block_info;
 } HT_block_info;
 

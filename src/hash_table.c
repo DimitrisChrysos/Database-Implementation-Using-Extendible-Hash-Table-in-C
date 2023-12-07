@@ -50,27 +50,17 @@ void save_Hash_table(void* header_inf) {
     HT_blocks *htb = data + offset;
     htb->num_of_indices = 0;
 
-    
-
     // Αποθήκευσε το Hash Tabble
     int total_indeces = header_info->size_of_hash_table;
     int max_indeces_per_block = (BF_BLOCK_SIZE - sizeof(HT_blocks)) / sizeof(int);
     int indeces_inserted = 0;
     int count_blocks_used = 0;
-    // printf("max_indeces_per_block = %d\n", max_indeces_per_block);
     void* save_start_block_data = data;
     if (max_indeces_per_block < total_indeces) {
         while (1) {
             for (int i = 0 ; i < max_indeces_per_block ; i++) {
                 int index_offset = count_blocks_used*max_indeces_per_block;
-                if (i+index_offset == 252) {
-                    // printf("\n\nhash_table[pos] -> pos=%d\n", i+index_offset);
-                    // printf("size_of_hash_table = %d\n", header_info->size_of_hash_table);
-                    // printf("hash_table[%d] = %d\n",i+index_offset, header_info->hash_table[i + index_offset]);
-                    // printf("save_start_block_data = %p | data = %p\n", save_start_block_data, data);
-                }
                 memcpy(data + i*sizeof(int), &(header_info->hash_table[i + index_offset]), sizeof(int));
-                // printf("hash_table[pos] -> pos=%d\n", i+index_offset);
                 htb->num_of_indices++;
                 indeces_inserted++;
                 if (indeces_inserted == total_indeces) {
@@ -92,7 +82,6 @@ void save_Hash_table(void* header_inf) {
                 BF_UnpinBlock(block);
                 BF_AllocateBlock(header_info->file_desc, block);
                 data = BF_Block_GetData(block);
-                // printf("1. save_start_block_data = %p | data = %p\n", save_start_block_data, data);
                 save_start_block_data = data;
                 htb = data + offset;
                 header_info->count_blocks_for_HT++;
@@ -107,7 +96,6 @@ void save_Hash_table(void* header_inf) {
                 BF_UnpinBlock(block);
                 BF_GetBlock(header_info->file_desc, htb->next_ht_block_id, block);
                 data = BF_Block_GetData(block);
-                // printf("2. save_start_block_data = %p | data = %p\n", save_start_block_data, data);
                 save_start_block_data = data;
                 htb->num_of_indices = 0;
                 htb = data + offset;
