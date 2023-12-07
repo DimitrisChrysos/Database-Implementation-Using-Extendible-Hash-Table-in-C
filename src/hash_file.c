@@ -111,7 +111,7 @@ HT_ErrorCode HT_OpenIndex(const char *fileName, int *indexDesc){
   *indexDesc = open_files_counter;
   open_files_counter++;
   open_files[*indexDesc] = *header;
-
+  
   // Φτιάχνουμε το Hash Table
   header->hash_table = (int*)malloc((header->size_of_hash_table) * sizeof(int));
   open_files[*indexDesc].hash_table = header->hash_table;
@@ -145,16 +145,79 @@ HT_ErrorCode HT_OpenIndex(const char *fileName, int *indexDesc){
       htb = data + offset;
     }
   }
-
+  
   // Αποδεσμεύσουμε το block
   BF_Block_Destroy(&block);
+
+  /////////////////////////////////////////////
+  // printf("1111\n");
+  // print_HashTable(header->hash_table, header->size_of_hash_table);
+  // printf("2222\n");
+
+  // Έλεγχος για το αν έχει recs το αρχείο και τότε 
+  // κατάλληλη αρχικοποίηση των μεταδεδομένων του αρχείου 
+  // int blocks_Num;
+  // BF_GetBlockCounter(header->file_desc, &blocks_Num);
+  // printf("blocks_Num = %d\n", blocks_Num);
+  // if (blocks_Num > 1) {
+
+  //   // Βάζουμε το τελευταίο block
+  //   BF_Block* last_block;
+  //   BF_Block_Init(&last_block);
+  //   CALL_BF(BF_GetBlock(header->file_desc, blocks_Num - 1, block));
+  //   data = BF_Block_GetData(block);
+  //   header->last_block = block;
+  //   BF_Block_SetDirty(last_block);
+  //   CALL_BF(BF_UnpinBlock(last_block));
+  // }
+  /////////////////////////////////////////////
+
+
+
+  
+  // int blocks_num;
+  // CALL_BF(BF_GetBlockCounter(file_desc, &blocks_num));
+  // if (blocks_num > 2) {
+  //   BF_Block * last_block;
+  //   BF_Block_Init(&last_block);
+  //   for (int i = blocks_num - 1 ; i > 0 ; i--) {
+  //     printf("i = %d\n",i);
+  //     CALL_BF(BF_GetBlock(file_desc, i, last_block));
+  //     void* data = BF_Block_GetData(last_block); 
+  //     HT_block_info* block_header = data + BF_BLOCK_SIZE - sizeof(HT_block_info);
+  //     if (block_header->is_block_info == 1) {
+        
+
+  //       header->last_block = last_block;
+  //       BF_Block_SetDirty(last_block);
+  //       CALL_BF(BF_GetBlock(header->file_desc, 0, last_block));
+  //       BF_Block_SetDirty(last_block);
+  //       CALL_BF(BF_UnpinBlock(last_block));
+  //       // CALL_BF(BF_UnpinBlock(last_block));
+  //       // printf("ey\n");
+  //       break;
+  //     }
+  //     else {
+  //       CALL_BF(BF_UnpinBlock(last_block));
+  //       continue;
+  //     }
+  //   }
+  // }
+
+  
+  // Αποδεσμεύσουμε το block
+  // BF_Block_Destroy(&last_block);
+  
+
+
+  
 
   return HT_OK;
 }
 
 HT_ErrorCode HT_CloseFile(int indexDesc) {
   //insert code here
-
+  
   // Παίρνουμε τα μεταδεδομένα του αρχείου
   HT_info* header_info = &open_files[indexDesc];
   int file_desc = header_info->file_desc;
@@ -165,9 +228,11 @@ HT_ErrorCode HT_CloseFile(int indexDesc) {
   CALL_BF(BF_GetBlock(file_desc, 0, block));
   void *data = BF_Block_GetData(block);
   HT_info* temp_header = data;
+  
+  // Κάνε save το Hash Table
+  save_Hash_table(header_info);
 
   // Ξανά αρχικοποίησε το header πριν το close
-  save_Hash_table(header_info);
   temp_header->count_blocks_for_HT = header_info->count_blocks_for_HT;
   temp_header->file_desc = header_info->file_desc;
   temp_header->global_depth = header_info->global_depth;
@@ -176,21 +241,24 @@ HT_ErrorCode HT_CloseFile(int indexDesc) {
   temp_header->last_HT_block_id = header_info->last_HT_block_id;
   temp_header->size_of_hash_table = header_info->size_of_hash_table;
   temp_header->total_rec = header_info->total_rec;
-
+  
   // Αποδεσμεύουμε το header block
+  free(header_info->hash_table);
   BF_Block_SetDirty(block);
   CALL_BF(BF_UnpinBlock(block));
   BF_Block_Destroy(&block);
 
   // Αποδεσμεύουμε το τελευταίο block
-  BF_Block *last_block = header_info->last_block;
-  BF_Block_SetDirty(last_block);
-  CALL_BF(BF_UnpinBlock(last_block));
-  BF_Block_Destroy(&last_block);
+  // BF_Block *last_block = header_info->last_block;
+  // BF_Block_SetDirty(last_block);
+  // printf("111111\n");
+  // CALL_BF(BF_UnpinBlock(last_block));
+  // printf("222222\n");
+  // BF_Block_Destroy(&last_block);
 
   // Κλείσε το αρχείο
   CALL_BF(BF_CloseFile(file_desc));
-
+  
   return HT_OK;
 }
 
