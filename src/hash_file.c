@@ -139,30 +139,36 @@ HT_ErrorCode HT_OpenIndex(const char *fileName, int *indexDesc){
     int count = 0;
     int total_indices = 0;
     // printf("num of indices = %d\n", htb->num_of_indices);
+    // printf("htb->next_ht_block_id = %d | header->count_blocks_for_HT = %d\n",htb->next_ht_block_id,header->count_blocks_for_HT);
     while (1) {
       for (int i = 0; i < htb->num_of_indices; i++) {
 
         //
-        int* temp_array = data;
-        printf("temp_array[%d] = %d\n", i, temp_array[i]);
+        // int* temp_array = data;
+        // printf("temp_array[%d] = %d\n", i, temp_array[i]);
 
         //
-
+        int *temp_value = data + i*sizeof(int);
+        // printf("total_indices = %d | block_num = %d\n", total_indices, *temp_value);
         memcpy(&(header->hash_table[total_indices]), data + i*sizeof(int), sizeof(int));
         total_indices++;
       }
-      BF_Block_SetDirty(block);
-      CALL_BF(BF_UnpinBlock(block));
+      // printf("htb->next_ht_block_id = %d | header->count_blocks_for_HT = %d\n",htb->next_ht_block_id,header->count_blocks_for_HT);
       if (htb->next_ht_block_id == -1 || header->count_blocks_for_HT == 1) {
+        // printf("IM ALIVE INSIDE WEIRD IF CASE\n");
+        BF_Block_SetDirty(block);
+        CALL_BF(BF_UnpinBlock(block));
         break;
       }  
+      BF_Block_SetDirty(block);
+      CALL_BF(BF_UnpinBlock(block));
       CALL_BF(BF_GetBlock(header->file_desc, htb->next_ht_block_id, block));
       data = BF_Block_GetData(block);
       htb = data + offset;
     }
   }
   
-
+  // print_HashTable(header->hash_table, header->size_of_hash_table);
 
 
 
@@ -181,7 +187,7 @@ HT_ErrorCode HT_CloseFile(int indexDesc) {
   HT_info* header_info = &open_files[indexDesc];
   int file_desc = header_info->file_desc;
 
-  printf("IN CLOSE: total_recs = %d\n", header_info->total_rec);
+  // printf("IN CLOSE: total_recs = %d\n", header_info->total_rec);
 
   // Κάνε unpin το πρώτο και το τελευταίο block
   BF_Block *block;
@@ -190,7 +196,14 @@ HT_ErrorCode HT_CloseFile(int indexDesc) {
 
   void *data = BF_Block_GetData(block);
   HT_info* temp_header = data;
+
+  // print_HashTable(header_info->hash_table, header_info->size_of_hash_table);
+
   // Ξανά αρχικοποίησε το header πριν το close
+  // printf("IN CLOSE: I'M ALIVE\n");
+  save_Hash_table(header_info);
+  // print_HashTable(header_info->hash_table, header_info->size_of_hash_table);
+  // printf("IN CLOSE: I'M ALIVE\n");
   temp_header->count_blocks_for_HT = header_info->count_blocks_for_HT;
   temp_header->file_desc = header_info->file_desc;
   temp_header->global_depth = header_info->global_depth;
@@ -199,9 +212,12 @@ HT_ErrorCode HT_CloseFile(int indexDesc) {
   temp_header->last_HT_block_id = header_info->last_HT_block_id;
   temp_header->size_of_hash_table = header_info->size_of_hash_table;
   temp_header->total_rec = header_info->total_rec;
-  save_Hash_table(header_info);
+  
   //
+  
   // print_HashTable(header_info->hash_table, header_info->size_of_hash_table);
+  
+  // printf("\n\n\n\n");
   //
   
   BF_Block_SetDirty(block);
@@ -234,6 +250,13 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
   CALL_BF(BF_GetBlock(file_desc, 0, header_block));
   void* data;
   
+  // if (record.id == 999) {
+  //   // print_HashTable(header_info->hash_table, header_info->size_of_hash_table);
+  //   printf(":((((\n");
+  //   int hash_value1 = hash_function(record.id, header_info->global_depth);
+  //   // int block_number1 = header_info->hash_table[hash_value1];
+  //   printf("hash_table[%d] = %d\n", hash_value1,header_info->hash_table[hash_value1]);
+  // }
 
   // Αρχίζει η διαδικασία του insert
   if (header_info->total_rec == 0) {
@@ -255,6 +278,8 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
     block_header->local_depth = 1;
     block_header->capacity = BF_BLOCK_SIZE - sizeof(record) - sizeof(HT_block_info);
     block_header->next_block_header = NULL;
+    block_header->next_block = -1;
+    block_header->is_block_info = 1;
     
     // Βάλε το record στην αρχή του block
     Record* rec = data;
@@ -310,7 +335,12 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
       block_header->local_depth = 1;
       block_header->capacity = BF_BLOCK_SIZE - sizeof(record) - sizeof(HT_block_info);
       last_block_header->next_block_header = block_header;
+      int new_block_num;
+      CALL_BF(BF_GetBlockCounter(header_info->file_desc, &new_block_num));
+      last_block_header->next_block = new_block_num-1;
       block_header->next_block_header = NULL;
+      block_header->next_block = -1;
+      block_header->is_block_info = 1;
 
       // Βάλε το record στην αρχή του block
       Record* rec = data;
@@ -433,8 +463,18 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
             new_block_header->num_of_rec = 0;
             new_block_header->local_depth = old_block_header->local_depth;
             new_block_header->capacity = BF_BLOCK_SIZE - sizeof(HT_block_info);
+            new_block_header->is_block_info = 1;
+            // last_block_header->next_block_header = block_header;
+            // block_header->next_block_header = NULL;
+
+
             last_block_header->next_block_header = block_header;
+            int new_block_num;
+            CALL_BF(BF_GetBlockCounter(header_info->file_desc, &new_block_num));
+            last_block_header->next_block = new_block_num-1;
             block_header->next_block_header = NULL;
+            block_header->next_block = -1;
+
             
             // Αύξησε το local_depth στο παλιό και το νέο block
             old_block_header->local_depth++;
@@ -448,7 +488,7 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
               }
             }
             
-            int new_block_num;
+            new_block_num=0;;
             if (half_bl == 1) {
               
               // Διπλασίασε το Hash Table και ενημέρωσε τα positions
@@ -622,8 +662,18 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
           new_block_header->num_of_rec = 0;
           new_block_header->local_depth = old_block_header->local_depth;
           new_block_header->capacity = BF_BLOCK_SIZE - sizeof(HT_block_info);
+          new_block_header->is_block_info = 1;
+          // last_block_header->next_block_header = block_header;
+          // block_header->next_block_header = NULL;
+
+
           last_block_header->next_block_header = block_header;
+          int new_block_num;
+          CALL_BF(BF_GetBlockCounter(header_info->file_desc, &new_block_num));
+          last_block_header->next_block = new_block_num-1;
           block_header->next_block_header = NULL;
+          block_header->next_block = -1;
+
 
           // Αύξησε το local_depth στο παλιό και το νέο block
           old_block_header->local_depth++;
@@ -633,7 +683,7 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
           int old_pos = hash_value;
           int new_pos = 2*old_pos;
           int old_block_num = block_number;
-          int new_block_num;
+          new_block_num = 0;
           CALL_BF(BF_GetBlockCounter(file_desc, &new_block_num));
           new_block_num--;
           header_info->hash_table[new_pos+1] = new_block_num;
@@ -754,6 +804,8 @@ HT_ErrorCode HT_PrintAllEntries(int indexDesc, int *id) {
     CALL_BF(BF_UnpinBlock(block));
   }
   else {
+
+
     int blocks_num;
     CALL_BF(BF_GetBlockCounter(file_desc, &blocks_num));
     printf("block num = %d\n", blocks_num);
@@ -762,16 +814,26 @@ HT_ErrorCode HT_PrintAllEntries(int indexDesc, int *id) {
       CALL_BF(BF_GetBlock(file_desc, i, block));
       void* data = BF_Block_GetData(block); 
       HT_block_info* block_header = data + BF_BLOCK_SIZE - sizeof(HT_block_info);
-      Record temp_rec;
-      for (int j = 0 ; j < block_header->num_of_rec ; j++) {
-        int offset = j*sizeof(Record);
-        memcpy(&temp_rec, data + offset, sizeof(Record));
-        printf("Block %d :", i);
-        printRecord(temp_rec);
+      if (block_header->is_block_info == 1) {
+        Record temp_rec;
+        for (int j = 0 ; j < block_header->num_of_rec ; j++) {
+          int offset = j*sizeof(Record);
+          memcpy(&temp_rec, data + offset, sizeof(Record));
+          printf("Block %d :", i);
+          printRecord(temp_rec);
+        }
+        BF_Block_SetDirty(block);
+        CALL_BF(BF_UnpinBlock(block));
       }
-      BF_Block_SetDirty(block);
-      CALL_BF(BF_UnpinBlock(block));
+      else {
+        CALL_BF(BF_UnpinBlock(block));
+        continue;;
+      }
     }
+
+
+
+
   }
   BF_Block_Destroy(&block);
   return HT_OK;
