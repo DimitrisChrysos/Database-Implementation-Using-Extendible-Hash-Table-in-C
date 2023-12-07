@@ -96,13 +96,29 @@ int main() {
   CALL_OR_DIE(HT_CloseFile(indexDesc));
 
   printf("\n\n\n\n");
-  CALL_OR_DIE(HT_OpenIndex(FILE_NAME, &indexDesc)); 
+  CALL_OR_DIE(HT_OpenIndex(FILE_NAME, &indexDesc));
   CALL_OR_DIE(HT_PrintAllEntries(indexDesc, &dec));
   CALL_OR_DIE(HashStatistics(indexDesc));
   CALL_OR_DIE(HT_CloseFile(indexDesc));
 
   printf("\n\n\n\n");
   CALL_OR_DIE(HT_OpenIndex(FILE_NAME, &indexDesc));
+  // CALL_OR_DIE(HT_PrintAllEntries(indexDesc, NULL));
+
+  printf("Insert Entries\n");
+  for (int id = 0; id < 5; ++id) {
+    // create a record
+    record.id = id;
+    r = rand() % 12;
+    memcpy(record.name, names[r], strlen(names[r]) + 1);
+    r = rand() % 12;
+    memcpy(record.surname, surnames[r], strlen(surnames[r]) + 1);
+    r = rand() % 10;
+    memcpy(record.city, cities[r], strlen(cities[r]) + 1);
+
+    CALL_OR_DIE(HT_InsertEntry(indexDesc, record));
+  }
+
   CALL_OR_DIE(HT_PrintAllEntries(indexDesc, NULL));
   CALL_OR_DIE(HT_PrintAllEntries(indexDesc, &dec));
   CALL_OR_DIE(HashStatistics(indexDesc));

@@ -751,8 +751,8 @@ HT_ErrorCode HT_PrintAllEntries(int indexDesc, int *id) {
         printRecord(temp_rec);
       }
     }
-    // BF_Block_SetDirty(block);
-    // CALL_BF(BF_UnpinBlock(block));
+    BF_Block_SetDirty(block);
+    CALL_BF(BF_UnpinBlock(block));
   }
   else {
 
@@ -774,8 +774,8 @@ HT_ErrorCode HT_PrintAllEntries(int indexDesc, int *id) {
         CALL_BF(BF_UnpinBlock(block));
       }
       else {
-        // BF_Block_SetDirty(block);
-        // CALL_BF(BF_UnpinBlock(block));
+        BF_Block_SetDirty(block);
+        CALL_BF(BF_UnpinBlock(block));
         continue;
       }
     }
