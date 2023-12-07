@@ -87,26 +87,35 @@ int main() {
     CALL_OR_DIE(HT_InsertEntry(indexDesc, record));
   }
 
+
   printf("RUN PrintAllEntries\n");
 
   int dec=521;
-  CALL_OR_DIE(HT_PrintAllEntries(indexDesc, NULL));
-  CALL_OR_DIE(HT_PrintAllEntries(indexDesc, &dec));
-  CALL_OR_DIE(HashStatistics(indexDesc));
-  CALL_OR_DIE(HT_CloseFile(indexDesc));
-
-  printf("\n\n\n\n");
-  CALL_OR_DIE(HT_OpenIndex(FILE_NAME, &indexDesc));
-  CALL_OR_DIE(HT_PrintAllEntries(indexDesc, &dec));
-  CALL_OR_DIE(HashStatistics(indexDesc));
-  CALL_OR_DIE(HT_CloseFile(indexDesc));
-
-  printf("\n\n\n\n");
-  CALL_OR_DIE(HT_OpenIndex(FILE_NAME, &indexDesc));
   // CALL_OR_DIE(HT_PrintAllEntries(indexDesc, NULL));
+  CALL_OR_DIE(HT_PrintAllEntries(indexDesc, &dec));
+  CALL_OR_DIE(HashStatistics(indexDesc));
+  CALL_OR_DIE(HT_CloseFile(indexDesc));
+
+  printf("\n\n\n\n");
+  CALL_OR_DIE(HT_OpenIndex(FILE_NAME, &indexDesc));
+
+
+  // CALL_OR_DIE(HT_PrintAllEntries(indexDesc, NULL));
+  // CALL_OR_DIE(HT_PrintAllEntries(indexDesc, &dec));
+
+  // record.id = 683;
+  // r = rand() % 12;
+  // memcpy(record.name, names[r], strlen(names[r]) + 1);
+  // r = rand() % 12;
+  // memcpy(record.surname, surnames[r], strlen(surnames[r]) + 1);
+  // r = rand() % 10;
+  // memcpy(record.city, cities[r], strlen(cities[r]) + 1);
+  // CALL_OR_DIE(HT_InsertEntry(indexDesc, record));
+  // CALL_OR_DIE(HT_PrintAllEntries(indexDesc, &record.id));
+  
 
   printf("Insert Entries\n");
-  for (int id = 0; id < 5; ++id) {
+  for (int id = 1001; id < 2000; ++id) {
     // create a record
     record.id = id;
     r = rand() % 12;
@@ -118,10 +127,18 @@ int main() {
 
     CALL_OR_DIE(HT_InsertEntry(indexDesc, record));
   }
-
   CALL_OR_DIE(HT_PrintAllEntries(indexDesc, NULL));
   CALL_OR_DIE(HT_PrintAllEntries(indexDesc, &dec));
-  CALL_OR_DIE(HashStatistics(indexDesc));
+
+  
+  CALL_OR_DIE(HT_CloseFile(indexDesc));
+
+
+  printf("\n\n\n\n");
+  CALL_OR_DIE(HT_OpenIndex(FILE_NAME, &indexDesc));
+  dec=444;
+  CALL_OR_DIE(HT_PrintAllEntries(indexDesc, NULL));
+  CALL_OR_DIE(HT_PrintAllEntries(indexDesc, &dec));
   CALL_OR_DIE(HT_CloseFile(indexDesc));
 
   BF_Close();

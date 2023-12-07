@@ -114,7 +114,6 @@ HT_ErrorCode HT_OpenIndex(const char *fileName, int *indexDesc){
   open_files[*indexDesc] = *header;
   
   // Φτιάχνουμε το Hash Table
-  
   header->hash_table = (int*)malloc((header->size_of_hash_table) * sizeof(int));
   open_files[*indexDesc].hash_table = header->hash_table;
   if (header->total_rec == 0) {
@@ -159,7 +158,6 @@ HT_ErrorCode HT_CloseFile(int indexDesc) {
   // Παίρνουμε τα μεταδεδομένα του αρχείου
   HT_info* header_info = &open_files[indexDesc];
   int file_desc = header_info->file_desc;
-
   // Παίρνουμε το header block
   BF_Block *block;
   BF_Block_Init(&block);
@@ -169,8 +167,8 @@ HT_ErrorCode HT_CloseFile(int indexDesc) {
   
   // Κάνε save το Hash Table
   if (header_info->has_changed == 1) {
+    
     save_Hash_table(header_info);
-    header_info->has_changed = 0;
   }
 
   // Ξανά αρχικοποίησε το header πριν το close
@@ -182,7 +180,19 @@ HT_ErrorCode HT_CloseFile(int indexDesc) {
   temp_header->last_HT_block_id = header_info->last_HT_block_id;
   temp_header->size_of_hash_table = header_info->size_of_hash_table;
   temp_header->total_rec = header_info->total_rec;
+  temp_header->has_changed = header_info->has_changed;
   open_files_counter--;
+  
+
+  // Κλείσε το αρχείο
+  // printf("header_info->has_changed = %d\n", header_info->has_changed);
+  if (header_info->has_changed == 1) {
+    
+    BF_Block_SetDirty(header_info->last_block);
+    CALL_BF(BF_UnpinBlock(header_info->last_block));
+    header_info->has_changed = 0;
+    temp_header->has_changed = header_info->has_changed;
+  }
   
   // Αποδεσμεύουμε το header block
   free(header_info->hash_table);
@@ -190,10 +200,8 @@ HT_ErrorCode HT_CloseFile(int indexDesc) {
   CALL_BF(BF_UnpinBlock(block));
   BF_Block_Destroy(&block);
 
-  // Κλείσε το αρχείο
-  BF_Block_SetDirty(header_info->last_block);
-  CALL_BF(BF_UnpinBlock(header_info->last_block));
   CALL_BF(BF_CloseFile(file_desc));
+  
   
   return HT_OK;
 }
@@ -203,7 +211,6 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
 
   // Παίρνουμε τα μεταδεδομένα του αρχείου
   HT_info* header_info = &open_files[indexDesc];
-  header_info->has_changed = 1;
   int file_desc = header_info->file_desc;
 
   // Παίρνουμε το block με τα μεταδεδομένα του αρχείου
@@ -221,6 +228,7 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
     BF_Block_Init(&block);
     CALL_BF(BF_AllocateBlock(file_desc, block));
     header_info->last_block = block;
+    header_info->has_changed = 1;
 
     // Αρχικοποίησε και βάλε το header που αποθηκεύει το info του 
     // block στο τέλος του block
@@ -274,6 +282,7 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
       BF_Block_Init(&block);
       CALL_BF(BF_AllocateBlock(file_desc, block));
       header_info->last_block = block;
+      header_info->has_changed = 1;
 
       // Αρχικοποίησε και βάλε το header που αποθηκεύει το info του 
       // block στο τέλος του block
@@ -361,7 +370,6 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
       }
       else {
         
-        
         // Πάρε το παλιό block
         int old_block_num = block_number;
         BF_Block *old_block = block;
@@ -372,6 +380,7 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
         void* old_block_data = BF_Block_GetData(block);
         
         if (block_header->local_depth < header_info->global_depth) {
+
           
           while (header_info->global_depth > block_header->local_depth) {
             
@@ -382,16 +391,19 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
             HT_block_info* last_block_header = data + BF_BLOCK_SIZE - sizeof(HT_block_info);
 
             // Κάνε Unpin και Destroy το last_block
-            CALL_BF(BF_UnpinBlock(last_block));
-            BF_Block_Destroy(&last_block);
+            if (header_info->has_changed == 1) {
+              CALL_BF(BF_UnpinBlock(last_block));
+              BF_Block_Destroy(&last_block);
+            }
 
             // Αρχικοποίσε ένα block ως new_block και βάλε το ως last_block
             new_block = NULL;
             BF_Block_Init(&new_block);
             CALL_BF(BF_AllocateBlock(file_desc, new_block));
             header_info->last_block = new_block;
+            header_info->has_changed = 1;
             
-
+            
             // Αρχικοποίησε και βάλε το header που αποθηκεύει το info του 
             // new_block στο τέλος του new_block
             data = BF_Block_GetData(new_block); 
@@ -563,14 +575,17 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
 
 
           // Κάνε Unpin και Destroy το παλιό block
-          CALL_BF(BF_UnpinBlock(last_block));
-          BF_Block_Destroy(&last_block);
+          if (header_info->has_changed == 1) {
+            CALL_BF(BF_UnpinBlock(last_block));
+            BF_Block_Destroy(&last_block);
+          }
 
           // Αρχικοποίσε ένα block ως new_block και βάλε το ως last_block
           new_block = NULL;
           BF_Block_Init(&new_block);
           CALL_BF(BF_AllocateBlock(file_desc, new_block));
           header_info->last_block = new_block;
+          header_info->has_changed = 1;
 
           // Αρχικοποίησε και βάλε το header που αποθηκεύει το info του 
           // new_block στο τέλος του new_block
@@ -689,7 +704,6 @@ HT_ErrorCode HashStatistics(int indexDesc) {
 
   int num_of_blocks;
   BF_GetBlockCounter(indexDesc, &num_of_blocks);
-  int counter = 1;
   BF_Block * block;
   BF_Block_Init(&block);
   int min = 99;
@@ -701,7 +715,6 @@ HT_ErrorCode HashStatistics(int indexDesc) {
     void * data = BF_Block_GetData(block);
     HT_block_info* block_header = data + BF_BLOCK_SIZE - sizeof(HT_block_info);
     if (block_header->is_block_info != 1)  {
-      counter++;
       break; 
     }
     if (block_header->num_of_rec > max) {
