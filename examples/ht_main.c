@@ -88,34 +88,134 @@ int main() {
   }
 
 
-  printf("RUN PrintAllEntries\n");
+  // printf("RUN PrintAllEntries\n");
 
-  int dec=521;
-  // CALL_OR_DIE(HT_PrintAllEntries(indexDesc, NULL));
-  CALL_OR_DIE(HT_PrintAllEntries(indexDesc, &dec));
-  CALL_OR_DIE(HashStatistics(indexDesc));
-  CALL_OR_DIE(HT_CloseFile(indexDesc));
-
-  printf("\n\n\n\n");
-  CALL_OR_DIE(HT_OpenIndex(FILE_NAME, &indexDesc));
-
-
+  // int dec=521;
   // CALL_OR_DIE(HT_PrintAllEntries(indexDesc, NULL));
   // CALL_OR_DIE(HT_PrintAllEntries(indexDesc, &dec));
+  // CALL_OR_DIE(HashStatistics(indexDesc));
+  // CALL_OR_DIE(HT_CloseFile(indexDesc));
 
-  // record.id = 683;
-  // r = rand() % 12;
-  // memcpy(record.name, names[r], strlen(names[r]) + 1);
-  // r = rand() % 12;
-  // memcpy(record.surname, surnames[r], strlen(surnames[r]) + 1);
-  // r = rand() % 10;
-  // memcpy(record.city, cities[r], strlen(cities[r]) + 1);
-  // CALL_OR_DIE(HT_InsertEntry(indexDesc, record));
-  // CALL_OR_DIE(HT_PrintAllEntries(indexDesc, &record.id));
+  // printf("\n\n\n\n");
+  // CALL_OR_DIE(HT_OpenIndex(FILE_NAME, &indexDesc));
+  // // printf("pou eimaste gtpm?\n");
+  // CALL_OR_DIE(HT_CreateIndex("data2.db"));
+  // int id2;
+  // CALL_OR_DIE(HT_OpenIndex("data2.db", &id2));
+  // // CALL_OR_DIE(HT_CloseFile(id2));
+
+  // CALL_OR_DIE(HT_PrintAllEntries(indexDesc, NULL));
+  // // CALL_OR_DIE(HT_PrintAllEntries(indexDesc, &dec));
+
+  // // record.id = 683;
+  // // r = rand() % 12;
+  // // memcpy(record.name, names[r], strlen(names[r]) + 1);
+  // // r = rand() % 12;
+  // // memcpy(record.surname, surnames[r], strlen(surnames[r]) + 1);
+  // // r = rand() % 10;
+  // // memcpy(record.city, cities[r], strlen(cities[r]) + 1);
+  // // CALL_OR_DIE(HT_InsertEntry(indexDesc, record));
+  // // CALL_OR_DIE(HT_PrintAllEntries(indexDesc, &record.id));
   
 
-  printf("Insert Entries\n");
-  for (int id = 1001; id < 2000; ++id) {
+  // printf("Insert Entries\n");
+  // for (int id = 1001; id < 2000; ++id) {
+  //   // create a record
+  //   record.id = id;
+  //   r = rand() % 12;
+  //   memcpy(record.name, names[r], strlen(names[r]) + 1);
+  //   r = rand() % 12;
+  //   memcpy(record.surname, surnames[r], strlen(surnames[r]) + 1);
+  //   r = rand() % 10;
+  //   memcpy(record.city, cities[r], strlen(cities[r]) + 1);
+
+  //   CALL_OR_DIE(HT_InsertEntry(indexDesc, record));
+  // }
+  // CALL_OR_DIE(HT_PrintAllEntries(indexDesc, NULL));
+  // // CALL_OR_DIE(HT_PrintAllEntries(indexDesc, &dec));
+
+  // for (int id = 0; id < 51; ++id) {
+  //   // create a record
+  //   record.id = id;
+  //   r = rand() % 12;
+  //   memcpy(record.name, names[r], strlen(names[r]) + 1);
+  //   r = rand() % 12;
+  //   memcpy(record.surname, surnames[r], strlen(surnames[r]) + 1);
+  //   r = rand() % 10;
+  //   memcpy(record.city, cities[r], strlen(cities[r]) + 1);
+
+  //   CALL_OR_DIE(HT_InsertEntry(id2, record));
+  // }
+
+  
+  // // CALL_OR_DIE(HT_CloseFile(indexDesc));
+
+
+  // // printf("\n\n\n\n");
+  // // CALL_OR_DIE(HT_OpenIndex(FILE_NAME, &indexDesc));
+  // // dec=444;
+  // CALL_OR_DIE(HT_PrintAllEntries(id2, NULL));
+  // CALL_OR_DIE(HashStatistics(id2));
+  // // CALL_OR_DIE(HT_PrintAllEntries(indexDesc, &dec));
+  // CALL_OR_DIE(HT_CloseFile(id2));
+  // CALL_OR_DIE(HT_CloseFile(indexDesc));
+
+  printf("RUN PrintAllEntries\n");
+  printf("*************************************************************\n");
+
+
+  printf("\n\n\n\n");
+  printf("TEST 1\n");
+  printf("*************************************************************\n");
+  int dec=521;
+  CALL_OR_DIE(HT_PrintAllEntries(indexDesc, NULL));
+  printf("\n");
+  CALL_OR_DIE(HT_PrintAllEntries(indexDesc, &dec));
+  printf("\n");
+  CALL_OR_DIE(HashStatistics(indexDesc));
+  CALL_OR_DIE(HT_CloseFile(indexDesc));
+  printf("*************************************************************\n");
+
+
+  printf("\n\n\n\n");
+  printf("TEST 2\n");
+  printf("*************************************************************\n");
+  CALL_OR_DIE(HT_OpenIndex(FILE_NAME, &indexDesc));
+  CALL_OR_DIE(HT_PrintAllEntries(indexDesc, NULL));
+  printf("\n");
+  dec=283;
+  CALL_OR_DIE(HT_PrintAllEntries(indexDesc, &dec));
+  printf("\n");
+  CALL_OR_DIE(HashStatistics(indexDesc));
+  CALL_OR_DIE(HT_CloseFile(indexDesc));
+  printf("*************************************************************\n");
+
+
+  printf("\n\n\n\n");
+  printf("TEST 3\n");
+  printf("*************************************************************\n");
+  CALL_OR_DIE(HT_OpenIndex(FILE_NAME, &indexDesc));
+  record.id = 683;
+  r = rand() % 12;
+  memcpy(record.name, names[r], strlen(names[r]) + 1);
+  r = rand() % 12;
+  memcpy(record.surname, surnames[r], strlen(surnames[r]) + 1);
+  r = rand() % 10;
+  memcpy(record.city, cities[r], strlen(cities[r]) + 1);
+  CALL_OR_DIE(HT_InsertEntry(indexDesc, record));
+  CALL_OR_DIE(HT_PrintAllEntries(indexDesc, &record.id));
+  CALL_OR_DIE(HT_PrintAllEntries(indexDesc, NULL));
+  CALL_OR_DIE(HT_CloseFile(indexDesc));
+  printf("*************************************************************\n");
+
+
+  printf("\n\n\n\n");
+  printf("TEST 4\n");
+  printf("*************************************************************\n");
+  CALL_OR_DIE(HT_OpenIndex(FILE_NAME, &indexDesc));
+  
+
+  for (int id = 1001; id < 2001; ++id) {
     // create a record
     record.id = id;
     r = rand() % 12;
@@ -127,19 +227,14 @@ int main() {
 
     CALL_OR_DIE(HT_InsertEntry(indexDesc, record));
   }
-  CALL_OR_DIE(HT_PrintAllEntries(indexDesc, NULL));
-  CALL_OR_DIE(HT_PrintAllEntries(indexDesc, &dec));
-
   
-  CALL_OR_DIE(HT_CloseFile(indexDesc));
-
-
-  printf("\n\n\n\n");
-  CALL_OR_DIE(HT_OpenIndex(FILE_NAME, &indexDesc));
-  dec=444;
   CALL_OR_DIE(HT_PrintAllEntries(indexDesc, NULL));
+  printf("\n");
   CALL_OR_DIE(HT_PrintAllEntries(indexDesc, &dec));
+  printf("\n");
+  CALL_OR_DIE(HashStatistics(indexDesc));
   CALL_OR_DIE(HT_CloseFile(indexDesc));
+  printf("*************************************************************\n");
 
-  BF_Close();
+  BF_Close(); 
 }

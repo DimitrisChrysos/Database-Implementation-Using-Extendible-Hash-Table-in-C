@@ -55,13 +55,13 @@ HT_ErrorCode HT_CreateIndex(const char *filename) {
 
   BF_Block_SetDirty(block);
   CALL_BF(BF_UnpinBlock(block));
-  CALL_BF(BF_CloseFile(file_desc));
+  // CALL_BF(BF_CloseFile(file_desc));
 
   // Δημιουργούμε τον πίνακα κατακερματισμού στο ίδιο αρχείο
   // Αρχικοποίηση 1ου block του HT
   BF_Block *HT_block;
   BF_Block_Init(&HT_block);
-  CALL_BF(BF_OpenFile(filename, &file_desc));
+  // CALL_BF(BF_OpenFile(filename, &file_desc));
   CALL_BF(BF_AllocateBlock(file_desc, HT_block));
   data = BF_Block_GetData(HT_block);
   HT_blocks * htb = data;
@@ -157,7 +157,7 @@ HT_ErrorCode HT_CloseFile(int indexDesc) {
   
   // Παίρνουμε τα μεταδεδομένα του αρχείου
   HT_info* header_info = &open_files[indexDesc];
-  int file_desc = header_info->file_desc;
+  int file_desc = indexDesc;
   // Παίρνουμε το header block
   BF_Block *block;
   BF_Block_Init(&block);
@@ -189,7 +189,7 @@ HT_ErrorCode HT_CloseFile(int indexDesc) {
   if (header_info->has_changed == 1) {
     
     BF_Block_SetDirty(header_info->last_block);
-    CALL_BF(BF_UnpinBlock(header_info->last_block));
+    // CALL_BF(BF_UnpinBlock(header_info->last_block));
     header_info->has_changed = 0;
     temp_header->has_changed = header_info->has_changed;
   }
