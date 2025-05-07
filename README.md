@@ -2,6 +2,9 @@
 
 This project implements an extendible hash table over a block-level storage manager, simulating the internal mechanics of a database system. Developed for the course **K18 - Υλοποίηση Συστημάτων Βάσεων Δεδομένων**, it focuses on efficient storage, retrieval, and indexing using extendible hashing principles and a provided block file (BF) layer.
 
+### Note:
+- Check the ```report.txt``` and ```DB_askisi_1_2021-2022.pdf``` files for more details.
+
 ---
 
 ## 📅 Course Info
