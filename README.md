@@ -23,6 +23,26 @@ This project implements an extendible hash table over a block-level storage mana
 
 ---
 
+## 🔧 Helper Functions
+
+- `uint32_t hash(char* data, size_t bytes)`: FNV-1a hash
+- `int hash_function(int id, int global_depth)`: Trims hash to match directory
+- `void double_hash(void* header_info)`: Doubles hash table, increases global depth
+- `void save_Hash_table(void* header_info)`: Persists hash table across blocks
+- `void print_HashTable(int* table, int size)`: Debug tool
+- `void dec2bin_string(unsigned int, char*)` & `int bin_string2dec(char*)`: Conversions
+
+---
+
+## ✅ Completed Functionality
+
+We implemented all core HT_* functions:
+- `HT_Init`, `HT_CreateIndex`, `HT_OpenIndex`, `HT_CloseFile`
+- `HT_InsertEntry`, `HT_PrintAllEntries`, `HashStatistics`
+- Includes modular testable implementation, robust unpinning, and LRU buffer handling.
+
+---
+
 ## 📚 Project Description
 
 The system supports:
@@ -106,24 +126,3 @@ make clean
   - Hash table entries are stored across multiple blocks if needed.
 
 ---
-
-## 🔧 Helper Functions
-
-- `uint32_t hash(char* data, size_t bytes)`: FNV-1a hash
-- `int hash_function(int id, int global_depth)`: Trims hash to match directory
-- `void double_hash(void* header_info)`: Doubles hash table, increases global depth
-- `void save_Hash_table(void* header_info)`: Persists hash table across blocks
-- `void print_HashTable(int* table, int size)`: Debug tool
-- `void dec2bin_string(unsigned int, char*)` & `int bin_string2dec(char*)`: Conversions
-
----
-
-## ✅ Completed Functionality
-
-We implemented all core HT_* functions:
-- `HT_Init`, `HT_CreateIndex`, `HT_OpenIndex`, `HT_CloseFile`
-- `HT_InsertEntry`, `HT_PrintAllEntries`, `HashStatistics`
-- Includes modular testable implementation, robust unpinning, and LRU buffer handling.
-
----
-
