@@ -1,6 +1,6 @@
 # 🗃️ Database Implementation using Extendible Hash Table in C — Block-Level Record Management
 
-This project implements an extendible hash table over a block-level storage manager, simulating the internal mechanics of a database system. Developed for the course **K18 - Υλοποίηση Συστημάτων Βάσεων Δεδομένων**, it focuses on efficient storage, retrieval, and indexing using extendible hashing principles and a provided block file (BF) layer.
+This project implements an extendible hash table over a block-level storage manager, simulating the internal mechanics of a database system. Developed for the course **Implementation of Database Management Systems**, it focuses on efficient storage, retrieval, and indexing using extendible hashing principles and a provided block file (BF) layer.
 
 ### Note:
 - Check the ```report.txt``` and ```DB_askisi_1_2021-2022.pdf``` files for more details.
@@ -9,7 +9,7 @@ This project implements an extendible hash table over a block-level storage mana
 
 ## 📅 Course Info
 
-- **Course**: K18 - Υλοποίηση Συστημάτων Βάσεων Δεδομένων  
+- **Course**: Implementation of Database Management Systems (K18 - Υλοποίηση Συστημάτων Βάσεων Δεδομένων)
 - **Semester**: Χειμερινό 2021–2022  
 - **Instructor**: Καθηγητής Ι. Ιωαννίδης  
 
@@ -27,7 +27,7 @@ This project implements an extendible hash table over a block-level storage mana
 
 - `uint32_t hash(char* data, size_t bytes)`: FNV-1a hash
 - `int hash_function(int id, int global_depth)`: Trims hash to match directory
-- `void double_hash(void* header_info)`: Doubles hash table, increases global depth
+- `void double_hash(void* header_info)`: Doubles the hash table, increases global depth
 - `void save_Hash_table(void* header_info)`: Persists hash table across blocks
 - `void print_HashTable(int* table, int size)`: Debug tool
 - `void dec2bin_string(unsigned int, char*)` & `int bin_string2dec(char*)`: Conversions
